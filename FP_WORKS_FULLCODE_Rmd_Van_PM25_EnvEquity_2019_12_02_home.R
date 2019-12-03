@@ -711,10 +711,8 @@ dev.off()
 ## ----Sets_parameters_from_OP_before--------------------------------------
 par(OP)
 
-
 ## ----sqrt----------------------------------------------------------------
 OP_idp4 <- sqrt(sum((IDW.out - spSample$PM25AGG)^2) / length(spSample))
-
 
 ## ------------------------------------------------------------------------
 # Create the interpolated surface
