@@ -704,9 +704,9 @@ summary(pm.income.poly$PM25.mean)
 summary(pm.income.poly)
 
 ## ----Plot_data_columns_Income_PM25---------------------------------------
-plot(pm.income.poly$Income~pm.income.poly$PM25.mean, main = "Plot of Income & Predicted PM2.5")
+plot(pm.income.poly$Income~pm.income.poly$PM25.mean, main = "Plot of Income ~ PM2.5 Mean")
 png("pm.income.poly_Income_PM25.mean.png")
-plot(pm.income.poly$Income~pm.income.poly$PM25.mean, main = "Plot of Income & Predicted PM2.5")
+plot(pm.income.poly$Income~pm.income.poly$PM25.mean, main = "Plot of Income ~ PM2.5 Mean")
 dev.off()
 
 ## ----Regression_model_1--------------------------------------------------
@@ -716,11 +716,11 @@ lm.model.1 <- lm(pm.income.poly$Income~pm.income.poly$PM25.mean)
 summary(lm.model.1)
 
 ## ----Plot_of_income_PM25_abline-----------------------------------------
-plot(pm.income.poly$Income~pm.income.poly$PM25.mean, main = "Plot of Income & Predicted PM2.5")
+plot(pm.income.poly$Income~pm.income.poly$PM25.mean, main = "Plot of Income ~ PM2.5 Mean")
 abline(lm.model.1, col="red", lw=2,lty=2)
 
 png("pm.income.poly_Income_PM25.mean.png")
-plot(pm.income.poly$Income~pm.income.poly$PM25.mean, main = "Plot of Income & Predicted PM2.5")
+plot(pm.income.poly$Income~pm.income.poly$PM25.mean, main = "Plot of Income ~ PM2.5 Mean")
 abline(lm.model.1, col="red", lw=2, lty=2)
 dev.off()
 
@@ -745,11 +745,11 @@ map_pm25_vit.data_regress_residuals1 <- tm_shape(pm.income.poly) +
               palette = "viridis", n = 6,
               border.col = "grey", 
               border.alpha = 0.05) +
-  tm_shape(spSample) +
-  tm_dots(col="PM25AGG", palette = "Reds", n=5,
+  #tm_shape(spSample) +
+  #tm_dots(col="PM25AGG", palette = "Reds", n=5,
           title="Sampled PM2.5 \n(ug/m^3)", size=0.08) + 
   tm_legend(legend.outside=FALSE, position = c(0.01, 0.01)) + 
-  tm_layout(inner.margins = c(.12, .17, .15, .03), title = "Metro Vancouver 2016 Census Tracts\nMedian $ Income Regression Residuals1", title.position = c("LEFT", "TOP")) + 
+  tm_layout(inner.margins = c(.12, .17, .15, .03), title = "Metro Vancouver 2016 Census Tracts\nIncome ~ PM2.5 Regression Residuals1", title.position = c("LEFT", "TOP")) + 
   tm_scale_bar(position = c(0.4, 0.05)) +  
   tm_compass(type= "4star", position=c("RIGHT", "TOP")) 
 # Use "fisher" instead of "jenks" for larger data sets
@@ -757,7 +757,7 @@ map_pm25_vit.data_regress_residuals1 <- tm_shape(pm.income.poly) +
 map_pm25_vit.data_regress_residuals1
 
 #create png
-png("map_pm25_vit.data_regress_residuals1.png")
+png("map_pm25_vit.data_regress_residuals1.noDot.png")
 map_pm25_vit.data_regress_residuals1
 dev.off()
 
@@ -783,7 +783,7 @@ map_vit.net <- tm_shape(pm.income.poly) + tm_borders(col='lightgrey') +
   tm_scale_bar(width = 0.22, position = c("RIGHT", "BOTTOM")) + 
   # add compass
   tm_compass(position = c("RIGHT", "TOP")) + 
-  tm_layout(title = "Metro Vancouver Census Tracts Median 2016 $ Income\nQueen Neighbours", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .08, .03))
+  tm_layout(title = "Metro Vancouver Census Tracts 2016 Income ~ PM2.5 \nQueen Neighbours (after Regression)", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .08, .03))
 map_vit.net
 
 png("map_vit.net_Income_QueenN_afterRegression.png")  
@@ -808,7 +808,7 @@ map_LagMean <- tm_shape(pm.income.poly) +
   # add scale bar - first value is TOP, second value is BOTTOM
   tm_compass(position = c("LEFT", "BOTTOM")) + 
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) + 
-  tm_layout(title = "Metro Vancouver Census Tracts Residuals Lagged Means \nMedian 2016 $ Income (after Regression)", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .13, .03))
+  tm_layout(title = "Metro Vancouver Census Tracts 2016 Residuals Lagged Means \n Income ~ PM2.5 (after Regression)", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .13, .03))
 map_LagMean
 ## Use "fisher" instead of "jenks" for larger data sets
 
@@ -866,7 +866,7 @@ map_LISA <- tm_shape(pm.income.poly) +
               border.alpha = 0.05) + 
   tm_compass(position = c("LEFT", "BOTTOM")) + 
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) +  
-  tm_layout(title = "Metro Vancouver Census Tracts Median 2016 $ Income\nLocal Moran's i Residuals (after Regression)", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .17, .03))
+  tm_layout(title = "Metro Vancouver Census Tracts 2016 Income ~ PM2.5 \nLocal Moran's i Residuals (after Regression)", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .17, .03))
 map_LISA
 ## Use "fisher" instead of "jenks" for larger data sets
 
@@ -885,7 +885,7 @@ map_LISA_Z <- tm_shape(pm.income.poly) +
               border.alpha = 0.05) + 
   tm_compass(position = c("LEFT", "BOTTOM")) + 
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) +  
-  tm_layout(title = "Metro Vancouver Census Tracts Median 2016 $ Income\nLocal Moran's i Residuals Z values \n(after Regression)", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .17, .03))
+  tm_layout(title = "Metro Vancouver Census Tracts 2016 Income ~ PM2.5 \nLocal Moran's i Residuals Z values \n(after Regression)", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .17, .03))
 map_LISA_Z
 
 png("map_LISA_vit_Income_Z_afterRegression.png")  
@@ -902,7 +902,7 @@ map_LISA_P <- tm_shape(pm.income.poly) +
               border.alpha = 0.05) + 
   tm_compass(position = c("LEFT", "BOTTOM")) + 
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) +  
-  tm_layout(title = "Metro Vancouver Census Tracts Median 2016 $ Income\nLocal Moran's i Residuals P values \n(after Regression)", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .17, .03))
+  tm_layout(title = "Metro Vancouver Census Tracts 2016 Income ~ PM2.5 \nLocal Moran's i Residuals P values \n(after Regression)", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .17, .03))
 map_LISA_P
 
 png("map_LISA_vit_Income_P_afterRegression.png")  
@@ -910,10 +910,10 @@ map_LISA_P
 dev.off()
 
 ## -------------------------------------------------------------------
-moran.plot(pm.income.poly$residuals1, vit.lw, zero.policy=NULL, spChk=NULL, labels=NULL, xlab="Median 2016 $ Income", ylab="Spatially Lagged Mean Median 2016 $ Income", quiet=NULL, main ="Local Moran's i Residuals Plot \nMetro Vancouver 2016 $ Income (after Regression)")
+moran.plot(pm.income.poly$residuals1, vit.lw, zero.policy=NULL, spChk=NULL, labels=NULL, xlab="Income ~ PM2.5 Residuals", ylab="Spatially Lagged Mean Income ~ PM2.5 Residuals", quiet=NULL, main ="Local Moran's i Residuals Plot \nMetro Vancouver 2016 Income ~ PM2.5  (after Regression)")
 
-png("moran.plot_vit_Income_afterRegression.png")  
-moran.plot(pm.income.poly$residuals1, vit.lw, zero.policy=NULL, spChk=NULL, labels=NULL, xlab="Median 2016 $ Income", ylab="Spatially Lagged Mean Median 2016 $ Income", quiet=NULL, main ="Local Moran's i Residuals Plot \nMetro Vancouver 2016 $ Income (after Regression)")
+png("moran.plot_vit_Residuals_afterRegression.png")  
+moran.plot(pm.income.poly$residuals1, vit.lw, zero.policy=NULL, spChk=NULL, labels=NULL, xlab="Income ~ PM2.5 Residuals", ylab="Spatially Lagged Mean Income ~ PM2.5 Residuals", quiet=NULL, main ="Local Moran's i Residuals Plot \nMetro Vancouver 2016 Income ~ PM2.5  (after Regression)")
 dev.off()
 
 ######################################################################
@@ -965,19 +965,19 @@ local.r.square <- pm.income.poly$localr
 ## ----Map_r_square---------------------------------------------------
 map_gwr_r_square <- tm_shape(pm.income.poly) + 
   tm_polygons(col = "localr", 
-              title = "\nGWR r square",
+              title = "\nGWR r^2",
               style = "fisher", 
-              palette = "viridis", n = 6,
+              palette = "viridis", n = 4,
               border.col = "grey", 
-              border.alpha = 0.05) + 
+              border.alpha = 0.03) + 
   tm_compass(position = c("LEFT", "BOTTOM")) + 
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) +  
-  tm_layout(title = "Metro Vancouver Census Tracts Median 2016 $ Income GWR r square", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .17, .03))
+  tm_layout(title = "Metro Vancouver Census 2016 Tracts  Income ~ PM 2.5 GWR r^2", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .17, .03))
 map_gwr_r_square
 
 # Use "fisher" instead of "jenks" for larger data sets
 
-png("map_map_gwr_r_square.png")  
+png("map_gwr_r_square.png")  
 map_gwr_r_square
 dev.off()
 
@@ -1003,12 +1003,12 @@ map_gwr_coefficient <- tm_shape(pm.income.poly) +
   tm_polygons(col = "coeff", 
               title = "\nGWR coefficient",
               style = "fisher", 
-              palette = "viridis", n = 6,
+              palette = "viridis", n = 4,
               border.col = "grey", 
-              border.alpha = 0.05) + 
+              border.alpha = 0.03) + 
   tm_compass(position = c("LEFT", "BOTTOM")) + 
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) +  
-  tm_layout(title = "Metro Vancouver Census Tracts Median 2016 $ Income GWR coefficient", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .17, .03))
+  tm_layout(title = "Metro Vancouver Census Tracts 2016 GWR Income ~ PM 2.5 Coefficient", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .17, .03))
 map_gwr_coefficient
 
 png("map_gwr_coefficient.png")  
