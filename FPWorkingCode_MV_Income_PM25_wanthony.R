@@ -1,5 +1,5 @@
 #############################################################
-## -- Metro Vancouver Income~PM25 Spatial Analysis ------- ##
+## ---- Metro Vancouver Income~PM25 Spatial Analysis ----- ##
 ## ----------------- Wendy Anthony ----------------------- ##
 ## --------------- Geog 418 B02  2019-12-04 -------------- ##
 #############################################################
@@ -10,7 +10,7 @@ setwd(dir)
 getwd()
 
 ## ----Install_Packages_at_once---------------------------------------
- install.packages(c("sf", "plyr", "dplyr", "spdep", "GISTools", "raster", "rgdal", "spatstat", "sp", "tmap", "gstat", "maptools", "spgwr", "grid", "moments", "bcmaps"))
+install.packages(c("sf", "plyr", "dplyr", "spdep", "GISTools", "raster", "rgdal", "spatstat", "sp", "tmap", "gstat", "maptools", "spgwr", "grid", "moments", "bcmaps"))
 install.packages("bcmapsdata", repos = "https://bcgov.github.io/drat/")
 
 ## ----Load_libraries-------------------------------------------------
@@ -36,7 +36,6 @@ library("bcmapsdata") # for study area inset map
 ######################################################################
 ## ----------------- Data Preparation ----------------------------- ##
 ######################################################################
-
 ## ----Read_in_PM25_particulate_matter_dataset------------------------
 ## Dataset I. PM2.5 
 pm25 <- read.csv("PM25.csv")
