@@ -1214,9 +1214,7 @@ z
 data.for.table5 = data.frame("n", "nnd", "studyArea", "pointDensity", "r.nnd", "d.nnd", "R", "SE.NND", "z")
 data.for.table5
 
-## ----kable_head_datatable5_PPA--------------------------------------
-# makes html table
-kable(head(data.for.table5))
+## ----create_csv_datatable5_PPA--------------------------------------
 write.csv(data.for.table5, "PPA.data.for.table5.csv", row.names = FALSE)
 
 ######################################################################
