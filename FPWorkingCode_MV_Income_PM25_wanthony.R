@@ -765,6 +765,12 @@ dev.off()
 summary(pm.income.poly)
 pm.income.poly
 
+## ----Plot_data_columns_residuals1_PM25---------------------------------------
+plot(pm.income.poly$residuals1~pm.income.poly$PM25.mean, main = "Plot of Income ~ PM2.5 Mean")
+png("pm.income.poly_residuals1_PM25.mean.png")
+plot(pm.income.poly$residuals1~pm.income.poly$PM25.mean, main = "Plot of Income ~ PM2.5 Mean")
+dev.off()
+
 ######################################################################
 ## ------------- Autocorrelation Moran's I (after regression) ----- ##
 ######################################################################
@@ -931,7 +937,6 @@ head(pm.income.poly.coords)
 ## ----Add_coordinates_back_to_spatialpolygondataframe----------------
 pm.income.poly$X <- pm.income.poly.coords[,1]
 pm.income.poly$Y <- pm.income.poly.coords[,2]
-head(pm.income.poly)
 head(pm.income.poly)
 names(pm.income.poly)
 
