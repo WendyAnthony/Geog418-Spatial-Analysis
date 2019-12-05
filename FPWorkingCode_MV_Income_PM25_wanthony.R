@@ -983,13 +983,15 @@ dev.off()
 
 ## ----Results_Map_coefficients---------------------------------------
 # View(results)
-class(results$pm.income.poly.Income)
+class(results)
+names(results)
+class(results$pm.income.poly.PM25.mean)
 head(results)
-results$pm.income.poly.Income
-summary(results$pm.income.poly.Income)
+results$pm.income.poly.PM25.mean
+summary(results$pm.income.poly.PM25.mean)
 
 ## ----Assign_coefficients--------------------------------------------
-pm.income.poly$coeff <- results$pm.income.poly.Income
+pm.income.poly$coeff <- results$pm.income.poly.PM25.mean
 head(pm.income.poly)
 summary(pm.income.poly$coeff)
 
