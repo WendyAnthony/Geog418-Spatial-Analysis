@@ -938,12 +938,12 @@ names(pm.income.poly)
 ## ----Determine_bandwidth_for_GWR------------------------------------
 ## Need to Install package spgwr
 ## this will take a while
-GWRbandwidth <- gwr.sel(pm.income.poly$PM25.mean~pm.income.poly$Income, 
+GWRbandwidth <- gwr.sel(pm.income.poly$Income~pm.income.poly$PM25.mean, 
                         data=pm.income.poly, coords=cbind(pm.income.poly$X, pm.income.poly$Y),adapt=T) 
 
 ## ----Perform_GWR_on_two_variables_with_bandwidth_determined---------
 ### This will take a looooooong time
-gwr.model = gwr(pm.income.poly$PM25.mean~pm.income.poly$Income, 
+gwr.model = gwr(pm.income.poly$Income~pm.income.poly$PM25.mean, 
                 data=pm.income.poly, coords=cbind(pm.income.poly$X, pm.income.poly$Y), 
                 adapt=GWRbandwidth, hatmatrix=TRUE, se.fit=TRUE) 
 #Print the results of the model
@@ -1096,7 +1096,7 @@ p = 1 - pchisq(chi.square, (M - 1))
 p  
 
 ## ----Add_NND_Stats_data_objects_4_to_data.frame---------------------
-data.for.table4 = data.frame("qcount", "qcount.df$x", "qcount.df$f", "X2", "n", "nnd", "sum.f.x2", "M", "N", "sum.fx.2", "VAR", "MEAN", "VMR", "p")
+data.for.table4 = data.frame(qcount.df$x, qcount.df$f, X2, n, nnd, sum.f.x2, M, N, sum.fx.2, VAR, MEAN, VMR, p)
 data.for.table4
 
 ## ----write_csv_datatable4_NND--------------------------------------
@@ -1146,7 +1146,7 @@ z <-  (nnd - r.nnd) / SE.NND
 z  
 
 ## ----Add_NND_Stats_data_objects_5_to_data.frame---------------------
-data.for.table5 = data.frame("n", "nnd", "studyArea", "pointDensity", "r.nnd", "d.nnd", "R", "SE.NND", "z")
+data.for.table5 = data.frame(n, nnd, studyArea, pointDensity, r.nnd, d.nnd, R, SE.NND, z)
 data.for.table5
 
 ## ----create_csv_datatable5_PPA--------------------------------------
