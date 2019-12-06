@@ -1,8 +1,8 @@
-#############################################################
-## ---- Metro Vancouver Income~PM25 Spatial Analysis ----- ##
-## ----------------- Wendy Anthony ----------------------- ##
-## --------------- Geog 418 B02  2019-12-04 -------------- ##
-#############################################################
+######################################################################
+## -------- Metro Vancouver Income~PM25 Spatial Analysis ---------- ##
+## --------------------- Wendy Anthony ---------------------------- ##
+## ----------------- Geog 418 B02  2019-12-04 --------------------- ##
+######################################################################
 
 ## ----Set_Working_Directory
 dir <- "/Users/wendyanthony/Documents/Geog418-AdvSpatialAnalysis/FinalProject/Working" # macBook
@@ -10,7 +10,7 @@ setwd(dir)
 getwd()
 
 ## ----Install_Packages_at_once---------------------------------------
-install.packages(c("sf", "plyr", "dplyr", "spdep", "GISTools", "raster", "rgdal", "spatstat", "sp", "tmap", "gstat", "maptools", "spgwr", "grid", "moments", "bcmaps"))
+install.packages(c("sf", "plyr", "dplyr", "spdep", "GISTools", "raster", "rgdal", "spatstat", "sp", "tmap", "gstat", "maptools", "spgwr", "moments", "bcmaps"))
 install.packages("bcmapsdata", repos = "https://bcgov.github.io/drat/")
 
 ## ----Load_libraries-------------------------------------------------
@@ -80,23 +80,6 @@ income.tracts.t <- merge(census.tracts.t, income, by = "DAUID")
 ## ----Remove_na_income.tracts----------------------------------------
 income.tracts.t <- income.tracts.t[!is.na(income.tracts.t$Income),]
 
-## ----Create_choropleth_map_of_income--------------------------------
-map_MdInc.t <- tm_shape(income.tracts.t) + 
-  tm_polygons(col = "Income", 
-              title = "Median Income", 
-              style = "fisher", 
-              palette = "viridis", n = 6,
-              border.col = "grey", 
-              border.alpha = 0.05) + 
-  tm_compass(position = c("LEFT", "BOTTOM")) + 
-  tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) + 
-  # add compass
-  tm_layout(title = "Metro Vancouver Census Tracts Median Income \n2016", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .08, .03))
-
-png("map_MdInc.t_income.tracts.t_fisher.png")  
-map_MdInc.t
-dev.off()
-
 ## ----Intersect_postalcodes_incometracts – check projection----------
 postalcodes.t <- intersect(postalcodes.t, income.tracts.t)
 crs(postalcodes.t)
@@ -155,7 +138,70 @@ fullgrid(grd)    <- TRUE  # Create SpatialGrid object
 proj4string(grd) <- proj4string(spSample)
 grd
 
-## ----Create_choropleth_map_with_layer_of_sample_100_data_points-----
+
+## ----Create_inset_map_for_study_site_location_map-------------------
+### ----Create_bc_spatial_map-----------------------------------------
+# needs libraries: bcmapsdata, bcmaps
+
+## ----Create_inset_map_for_study_site_location_map-------------------
+### ----create_bc_spatial_map-----------------------------------------
+bc <- as_Spatial(bc_neighbours()) #Get shp of BC bounds
+bc <- spTransform(bc, CRS("+init=epsg:3005")) #project to BC Albers
+bc <- bc[which(bc$name == "British Columbia" ),] #Extract just the BC province
+bc
+
+## ----Create_inset_map_for_study_site_location_map-------------------
+### ----1_Main_Map----------------------------------------------------
+map_MV_ct <- tm_shape(income.tracts.t) + 
+  #tm_fill(col = "gray60") +  #fill polygons +
+  tm_borders("grey50", alpha=1, lwd=.21) +
+  tm_compass(position = c("RIGHT", "TOP")) + 
+  tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) + 
+  tm_layout(title = "Metro Vancouver Census Tracts 2016", title.position = c("center", "TOP"))
+map_MV_ct
+
+## ----2_Create_inset_map_for_context_to_main_message_map-------------
+map_tm_bc1 <- tm_shape(bc) + # make the main shape
+  tm_fill(col = "gray80") +  # fill polygons
+  tm_borders("grey5", alpha=0.3, lwd=.21) +
+  tm_shape(pm25.points.aggregate) + # map_tm_bc1 (full set of PM2.5 data points)
+  #tm_shape(spSample) + # map_tm_bc (fewer PM2.5 sample points don't show up as much)
+  tm_dots(col="PM25AGG", palette = "Greys", n=3) +
+  tm_legend(show=FALSE)
+map_tm_bc1
+
+## ----Create_inset_map_for_study_site_location_map-------------------
+### ----3_Define_area_of_interest_create_spatial_object---------------
+bc_region = st_bbox(c(xmin = 273435.7, xmax = 368702.7,
+                      ymin = 368702., ymax = 1735755),
+                    crs = st_crs(map_tm_bc1)) %>% 
+  st_as_sfc()
+
+## ----Create_inset_map_for_study_site_location_map-------------------
+### ----4_Combine_map_inset_using_viewport_study_area_using_viewport_grid_package
+png("map_MV_CT_BC1_inset.png")
+map_MV_ct
+print(map_tm_bc1, vp = viewport(0.13, 0.33, width = 0.2, height = 0.2))
+dev.off()
+
+## ----Create_choropleth_map_of_income--------------------------------
+map_MdInc.t <- tm_shape(income.tracts.t) + 
+  tm_polygons(col = "Income", 
+              title = "Median Income", 
+              style = "fisher", 
+              palette = "viridis", n = 6,
+              border.col = "grey", 
+              border.alpha = 0.05) + 
+  tm_compass(position = c("LEFT", "BOTTOM")) + 
+  tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) + 
+  # add compass
+  tm_layout(title = "Metro Vancouver Census Tracts Median Income \n2016", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .08, .03))
+
+png("map_MdInc.t_income.tracts.t_fisher.png")  
+map_MdInc.t
+dev.off()
+
+## ----Create_choropleth_map_with_layer_of_sample_100_data_points------
 map_pm25_vit.data_medInc <- tm_shape(income.tracts.t) + 
   tm_polygons(col = "Income", 
               title = "Median Income", 
@@ -176,60 +222,16 @@ png("map_pm25_vit.data_medIncome_smp100_1_dot.08.png")
 map_pm25_vit.data_medInc
 dev.off()
 
-## ----Create_inset_map_for_study_site_location_map-------------------
-### ----Create_bc_spatial_map------------------------------------------
-# needs libraries: bcmapsdata, bcmaps
-
-## ----Create_inset_map_for_study_site_location_map-------------------
-### ----create_bc_spatial_map------------------------------------------
-bc <- as_Spatial(bc_neighbours()) #Get shp of BC bounds
-bc <- spTransform(bc, CRS("+init=epsg:3005")) #project to BC Albers
-bc <- bc[which(bc$name == "British Columbia" ),] #Extract just the BC province
-bc
-
-## ----Create_inset_map_for_study_site_location_map-------------------
-### ----1_Main_Map-----------------------------------------------------
-map_MV_ct <- tm_shape(income.tracts.t) + 
-  #tm_fill(col = "gray60") +  #fill polygons +
-  tm_borders("grey5", alpha=1, lwd=.21) +
-  tm_compass(position = c("RIGHT", "TOP")) + 
-  tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) + 
-  tm_layout(title = "Metro Vancouver Census Tracts 2016", title.position = c("center", "TOP"))
-map_MV_ct
-
-## ----2_Create_inset_map_for_context_to_main_message_map-------------
-map_tm_bc1 <- tm_shape(bc) + # make the main shape
-  tm_fill(col = "gray80") +  # fill polygons
-  tm_shape(pm25.points.aggregate) + # map_tm_bc1 (full set of PM2.5 data points)
-  #tm_shape(spSample) + # map_tm_bc (fewer PM2.5 sample points don't show up as much)
-  tm_dots(col="PM25AGG", palette = "Greys", n=3) +
-  tm_legend(show=FALSE)
-map_tm_bc1
-
-## ----Create_inset_map_for_study_site_location_map-------------------
-### ----3_Define_area_of_interest_create_spatial_object----------------
-bc_region = st_bbox(c(xmin = 273435.7, xmax = 368702.7,
-                      ymin = 368702., ymax = 1735755),
-                    crs = st_crs(map_tm_bc1)) %>% 
-  st_as_sfc()
-
-## ----Create_inset_map_for_study_site_location_map-------------------
-### ----4_Combine_map_inset_using_viewport_study_area_using_viewport_grid_package
-png("map_MV_CT_BC1_inset.png")
-map_MV_ct
-print(map_tm_bc1, vp = viewport(0.13, 0.33, width = 0.2, height = 0.2))
-dev.off()
-
 ######################################################################
 ## ---------------- Descriptive Statistics ------------------------ ##
 ######################################################################
-## ---------Summary_data---------------------------------------------------
+## ---------Summary_data----------------------------------------------
 summary(income.tracts.t)
 summary(income.pm25)
 summary(pm25.points.aggregate)
 summary(spSample)
 
-## ----Mean_calc-----------------------------------------------------------
+## ----Mean_calc------------------------------------------------------
 mean.income.tracts.t.Income <- mean(income.tracts.t$Income)  # used by Moran's i
 mean.income.tracts.t.Income # [1] 33868
 mean.income.pm25.PM25AGG <- mean(income.pm25$PM25AGG)
@@ -240,7 +242,7 @@ mean.spSample.Income # [1] 36021.82
 mean.spSample.PM25AGG <- mean(spSample$PM25AGG)
 mean.spSample.PM25AGG # [1] 1.996
 
-## ----SD_calc-------------------------------------------------------------
+## ----SD_calc--------------------------------------------------------
 sd.income.tracts.t.Income <- sd(income.tracts.t$Income)
 sd.income.tracts.t.Income # [1] 8835.894
 sd.income.pm25.PM25AGG <- sd(income.pm25$PM25AGG)
@@ -251,7 +253,7 @@ sd.spSample.Income # [1] 9416.431
 sd.spSample.PM25AGG <- sd(spSample$PM25AGG)
 sd.spSample.PM25AGG # [1] 1.491316
 
-## ----Mode_calc-----------------------------------------------------------
+## ----Mode_calc------------------------------------------------------
 mode.income.tracts.t.Income <- as.numeric(names(sort(table(income.tracts.t$Income), decreasing = TRUE))[1])
 mode.income.tracts.t.Income # [1] 34176
 mode.income.pm25.PM25AGG <- as.numeric(names(sort(table(income.pm25$PM25AGG), decreasing = TRUE))[1])
@@ -262,7 +264,7 @@ mode.income.tracts.t.Income # [1] 34176
 mode.spSample.PM25AGG <- as.numeric(names(sort(table(spSample$PM25AGG), decreasing = TRUE))[1])
 mode.spSample.PM25AGG # [1] 0.1
 
-## ----Median_calc---------------------------------------------------------
+## ----Median_calc----------------------------------------------------
 med.income.tracts.t.Income <- median(income.tracts.t$Income, na.rm = TRUE)
 med.income.tracts.t.Income # [1] 33152
 med.income.pm25.PM25AGG <- median(income.pm25$PM25AGG, na.rm = TRUE)
@@ -273,7 +275,7 @@ med.spSample.Income # [1] 34752
 med.spSample.PM25AGG <- median(spSample$PM25AGG, na.rm = TRUE)
 med.spSample.PM25AGG # [1] 1.8
 
-## ----Skewness_calc-------------------------------------------------------
+## ----Skewness_calc--------------------------------------------------
 skew.income.tracts.t.Income <- skewness(income.tracts.t$Income, na.rm = TRUE)[1]
 skew.income.tracts.t.Income # [1] 0.4087659
 skew.income.pm25.PM25AGG <- skewness(income.pm25$PM25AGG, na.rm = TRUE)[1]
@@ -284,7 +286,7 @@ skew.spSample.Income # [1] 0.4296544
 skew.spSample.PM25AGG <- skewness(spSample$PM25AGG, na.rm = TRUE)[1]
 skew.spSample.PM25AGG # [1] 0.3529682
 
-## ----Kurtosis_calc-------------------------------------------------------
+## ----Kurtosis_calc--------------------------------------------------
 kurt.income.tracts.t.Income <- kurtosis(income.tracts.t$Income, na.rm = TRUE)[1]
 kurt.income.tracts.t.Income # [1] 2.902638
 kurt.income.pm25.PM25AGG <- kurtosis(income.pm25$PM25AGG, na.rm = TRUE)[1]
@@ -295,7 +297,7 @@ kurt.spSample.Income # [1] 2.328493
 kurt.spSample.PM25AGG <- kurtosis(spSample$PM25AGG, na.rm = TRUE)[1]
 kurt.spSample.PM25AGG # [1] 2.05602
 
-## ----CoV_calc------------------------------------------------------------
+## ----CoV_calc-------------------------------------------------------
 CoV.income.tracts.t.Income <- (sd.income.tracts.t.Income / mean.income.tracts.t.Income) * 100
 CoV.income.tracts.t.Income # [1] 26.08921
 CoV.income.pm25.PM25AGG <- (sd.income.pm25.PM25AGG / mean.income.pm25.PM25AGG) * 100
@@ -306,7 +308,7 @@ CoV.spSample.Income # [1] 26.14091
 CoV.spSample.PM25AGG <- (sd.spSample.PM25AGG / mean.spSample.PM25AGG) * 100
 CoV.spSample.PM25AGG # [1] 74.71524
 
-## ----Normal_dist_calc----------------------------------------------------
+## ----Normal_dist_calc-----------------------------------------------
 norm.income.tracts.t.Income_PVAL <- shapiro.test(income.tracts.t$Income)$p.value
 norm.income.tracts.t.Income_PVAL # [1] 7.991269e-20
 norm.income.pm25.PM25AGG_PVAL <- shapiro.test(income.pm25$PM25AGG)$p.value
@@ -317,62 +319,190 @@ norm.spSample.Income_PVAL # [1] 0.005087551
 norm.spSample.PM25AGG_PVAL <- shapiro.test(spSample$PM25AGG)$p.value
 norm.spSample.PM25AGG_PVAL # [1] 7.730187e-05
 
-## ----Label_object--------------------------------------------------------
+## ----Label_object---------------------------------------------------
 Samples <- c("Income (All)", "Income (Sample)", "PM2.5 (All)", "PM2.5 (Sample)") 
 Samples
 
-## ----Mean_object---------------------------------------------------------
+## ----Mean_object----------------------------------------------------
 Mean <- c(mean.income.tracts.t.Income, mean.spSample.Income, mean.income.pm25.PM25AGG, mean.spSample.PM25AGG) 
 Mean = round(Mean, 3)
 Mean
 
-## ----SD_object-----------------------------------------------------------
+## ----SD_object------------------------------------------------------
 StandardDeviation <- c(sd.income.tracts.t.Income, sd.spSample.Income, sd.income.pm25.PM25AGG, sd.spSample.PM25AGG) 
 StandardDeviation = round(StandardDeviation, 3)
 StandardDeviation
 
-## ----Median_object-------------------------------------------------------
+## ----Median_object--------------------------------------------------
 Median <- c(med.income.tracts.t.Income, med.spSample.Income, med.income.pm25.PM25AGG, med.spSample.PM25AGG) 
 Median = round(Median, 3)
 Median
 
-## ----Mode_object---------------------------------------------------------
+## ----Mode_object----------------------------------------------------
 Mode <- c(mode.income.tracts.t.Income, mode.spSample.Income, mode.income.pm25.PM25AGG, mode.spSample.PM25AGG) 
 Mode = round(Mode, 3)
 Mode
 
-## ----Skewness_object-----------------------------------------------------
+## ----Skewness_object------------------------------------------------
 Skewness <- c(skew.income.tracts.t.Income, skew.spSample.Income, skew.income.pm25.PM25AGG, skew.spSample.PM25AGG) 
 Skewness = round(Skewness, 3)
 Skewness
 
-## ----Kurtosis_object-----------------------------------------------------
+## ----Kurtosis_object------------------------------------------------
 Kurtosis <- c(kurt.income.tracts.t.Income, kurt.spSample.Income, kurt.income.pm25.PM25AGG, kurt.spSample.PM25AGG) 
 Kurtosis = round(Kurtosis, 3)
 Kurtosis
 
-## ----CoV_object----------------------------------------------------------
+## ----CoV_object-----------------------------------------------------
 CoefficientOfVariation <- c(CoV.income.tracts.t.Income, CoV.spSample.Income, CoV.income.pm25.PM25AGG, CoV.spSample.PM25AGG) 
 CoefficientOfVariation = round(CoefficientOfVariation, 3)
 CoefficientOfVariation
 
-## ----PVAL_object---------------------------------------------------------
+## ----PVAL_object----------------------------------------------------
 Normality <- c(norm.income.tracts.t.Income_PVAL, norm.spSample.Income_PVAL, norm.income.pm25.PM25AGG_PVAL, norm.spSample.PM25AGG_PVAL) 
 Normality
 
-## ----Table_dataframe_DescStats-------------------------------------------
+## ----Table_dataframe_DescStats--------------------------------------
 data.for.table1.1 = data.frame(Samples, Mean, Median, Mode, StandardDeviation, CoefficientOfVariation, Skewness, Kurtosis, Normality)
-data.for.table1 = data.frame(Samples, Mean, Median, Mode, StandardDeviation, CoefficientOfVariation)
-data.for.table2 = data.frame(Samples, Skewness, Kurtosis, Normality)
-
 data.for.table1.1
-data.for.table1
-data.for.table2
-
-## ----Table_csv_write_DescStats-------------------------------------------
 write.csv(data.for.table1.1, "DescriptiveStats1.1.csv", row.names = FALSE)
-write.csv(data.for.table1, "DescriptiveStats1.csv", row.names = FALSE)
-write.csv(data.for.table2, "DescriptiveStats2.csv", row.names = FALSE)
+
+######################################################################
+## ------------- Point Pattern Analysis --------------------------- ##
+######################################################################
+## ----spSample_info_PPA----------------------------------------------
+head(spSample)
+summary(spSample)
+
+## ----Coordinates_added_to_spSample----------------------------------
+spSample$x <- coordinates(spSample)[,1]
+spSample$y <- coordinates(spSample)[,2]
+
+## ----Finds_zero_distance_among_points-------------------------------
+zd <- zerodist(spSample)
+
+## ----Check_for_and_remove_duplicated_points-------------------------
+spSample <- remove.duplicates(spSample)
+spSample
+
+## -------------------------------------------------------------------
+spSample.ext <- as.matrix(extent(spSample)) 
+
+## ----Observation_window---------------------------------------------
+window <- as.owin(list(xrange = spSample.ext[1,], yrange = spSample.ext[2,]))
+
+## ----Create_ppp_object_from_spatstat--------------------------------
+spSample.ppp <- ppp(x = spSample$x, y = spSample$y, window = window)
+spSample.ppp
+
+## ----Number_quads---------------------------------------------------
+quads <- 10
+
+## ----Count_number_of_quads------------------------------------------
+qcount <- quadratcount(spSample.ppp, nx = quads, ny = quads)
+qcount
+
+## ----Create_dataframe_for_quadcount---------------------------------
+qcount.df <- as.data.frame(qcount)
+qcount.df
+
+## ----Count_number_of_quadrats_with_distinct_number_of_points--------
+qcount.df <- plyr::count(qcount.df,'Freq')
+qcount.df
+
+## --Change_column_names_to_xnumber_points_and_frequency_of_quadrats -
+colnames(qcount.df) <- c("x","f")
+qcount.df
+
+## -------------------------------------------------------------------
+qcount.df$x
+qcount.df$f
+
+X2 <- qcount.df$x ^ 2
+X2
+
+sum.f.x2 <- sum(qcount.df$f * qcount.df$x ^ 2)
+sum.f.x2
+
+M <- sum(qcount.df$f)
+M
+
+N <- sum(qcount.df$x * qcount.df$f)
+N
+
+sum.fx.2 <- (sum(qcount.df$f * qcount.df$x))^2
+sum.fx.2
+
+VAR <- (sum.f.x2 -(sum.fx.2/M))/M-1
+VAR
+
+MEAN <- N / M
+MEAN
+
+VMR <- VAR / MEAN
+VMR
+
+## ----Chi_square_test_for_random_spatial_pattern---------------------
+chi.square = VMR *(M - 1)
+p = 1 - pchisq(chi.square, (M - 1))
+p  
+
+## ----Add_NND_Stats_data_objects_4_to_data.frame---------------------
+data.for.table4 = data.frame(qcount.df$x, qcount.df$f, X2, n, nnd, sum.f.x2, M, N, sum.fx.2, VAR, MEAN, VMR, p)
+data.for.table4
+
+## ----write_csv_datatable4_NND--------------------------------------
+write.csv(data.for.table4, "NND.data.for.table4.csv", row.names = FALSE)
+
+## ----Calculate_nearestNeighbour-------------------------------------
+nearestNeighbour <- nndist(spSample.ppp)
+nearestNeighbour
+
+## ----Convert_nearestNeighbor_object_into_dataframe------------------
+nearestNeighbour=as.data.frame(as.numeric(nearestNeighbour))
+nearestNeighbour
+
+## ----Nearest_Neighbour_info-----------------------------------------
+class(nearestNeighbour)
+head(nearestNeighbour)
+
+## ----Change_column_name_to_Distance---------------------------------
+colnames(nearestNeighbour) = "Distance"
+head(nearestNeighbour)
+
+n <- nrow(nearestNeighbour)
+n  
+
+nnd <- sum(nearestNeighbour$Distance) / n
+nnd 
+
+studyArea <- gArea(spgeom = income.tracts.t, byid = FALSE)
+studyArea
+
+pointDensity <- n / studyArea
+pointDensity 
+
+r.nnd <- 1/(2*sqrt(pointDensity))
+r.nnd
+
+d.nnd <- 1.07453 / pointDensity^(1/2)
+d.nnd
+
+R <- nnd / r.nnd
+R 
+
+SE.NND <- 0.26136 / (n * pointDensity)^(1/2)
+SE.NND  
+
+z <-  (nnd - r.nnd) / SE.NND
+z  
+
+## ----Add_NND_Stats_data_objects_5_to_data.frame---------------------
+data.for.table5 = data.frame(n, nnd, studyArea, pointDensity, r.nnd, d.nnd, R, SE.NND, z)
+data.for.table5
+
+## ----create_csv_datatable5_PPA--------------------------------------
+write.csv(data.for.table5, "PPA.data.for.table5.csv", row.names = FALSE)
 
 ######################################################################
 ## ---------------- Autocorrelation Moran's I --------------------- ##
@@ -402,7 +532,7 @@ income.tracts.t$IncLagMeans = lag.listw(vit.lw, income.tracts.t$Income, zero.pol
 
 ## ----Map_Lagged_Means-----------------------------------------------
 ## Use "fisher" instead of "jenks" for larger data sets
-map_LagMean <- tm_shape(income.tracts.t) + 
+map_LagMean_inc <- tm_shape(income.tracts.t) + 
   tm_polygons(col = "IncLagMeans", 
               title = "Median 2016 $ Income\nLagged Means", 
               style = "fisher", 
@@ -413,10 +543,10 @@ map_LagMean <- tm_shape(income.tracts.t) +
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) + 
   tm_layout(title = "Metro Vancouver Census Tracts \nMedian 2016 $ Income Lagged Means", 
             title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .13, .03))
-map_LagMean
+map_LagMean_inc
 
 png("map_LagMean_vit_Income.png")  
-map_LagMean
+map_LagMean_inc
 dev.off()
 
 ## ----Global_Morans_I_Test-------------------------------------------
@@ -454,7 +584,7 @@ income.tracts.t$Z.Ho <- income.tracts.t$Z.Ii < 1.96
 ## ----Ii_value_lessthan0_negative------------------------------------
 income.tracts.t$Ii.Neg <- income.tracts.t$Ii < 0
 
-## ----P_onetail_value_test_multiply_by_2_for_twotail-----------
+## ----P_onetail_value_test_multiply_by_2_for_twotail-----------------
 income.tracts.t$Po <- (income.tracts.t$P * 2) > 0.05
 income.tracts.t$Po
 
@@ -463,7 +593,7 @@ income.tracts.t
 head(income.tracts.t)
 
 ## ----Mapping_Local_Morans_LISA--------------------------------------
-map_LISA <- tm_shape(income.tracts.t) + 
+map_LISA_inc <- tm_shape(income.tracts.t) + 
   tm_polygons(col = "Ii", 
               title = "Local Moran's i", 
               style = "fisher", 
@@ -473,15 +603,15 @@ map_LISA <- tm_shape(income.tracts.t) +
   tm_compass(position = c("LEFT", "BOTTOM")) + 
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) +  
   tm_layout(title = "Metro Vancouver Census Tracts Median 2016 $ Income\nLocal Moran's i", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .13, .03))
-map_LISA
+map_LISA_inc
 
 png("map_LISA_vit_Income.png")  
-map_LISA
+map_LISA_inc
 dev.off()
 
 ## ----Mapping_Local_Morans_LISA_Z (manual breaks)--------------------
 # https://stackoverflow.com/questions/49423007/how-to-adjust-color-palette-with-customized-breaks-in-tmap
-map_LISA_Z <- tm_shape(income.tracts.t) + 
+map_LISA_Z_inc <- tm_shape(income.tracts.t) + 
   tm_polygons(col = "Z.Ii", 
               title = "\nLocal Moran's i Z values", 
               breaks = c(-Inf, -2.326, -1.96, 1.96, 2.326, Inf ),
@@ -492,14 +622,14 @@ map_LISA_Z <- tm_shape(income.tracts.t) +
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) +  
   tm_layout(title = "Metro Vancouver Census Tracts Median 2016 $ Income\nLocal Moran's i Z values", title.position = c("LEFT", "TOP"), 
             inner.margins = c(.08, .03, .13, .03))
-map_LISA_Z
+map_LISA_Z_inc
 
 png("map_LISA_vit_Income_Z.png")  
-map_LISA_Z
+map_LISA_Z_inc
 dev.off()
 
 ## ----Mapping_Local_Morans_LISA_P (manual breaks)--------------------
-map_LISA_P <- tm_shape(income.tracts.t) + 
+map_LISA_P_inc <- tm_shape(income.tracts.t) + 
   tm_polygons(col = "P", 
               title = "\nLocal Moran's i P values",
               breaks = c(0, 0.001, 0.01, 0.05, Inf ),  # 95% p=0.05
@@ -510,10 +640,10 @@ map_LISA_P <- tm_shape(income.tracts.t) +
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) +  
   tm_layout(title = "Metro Vancouver Census Tracts Median 2016 $ Income\nLocal Moran's i P values", title.position = c("LEFT", "TOP"), 
             inner.margins = c(.08, .03, .13, .03))
-map_LISA_P
+map_LISA_P_inc
 
 png("map_LISA_vit_Income_P.png")  
-map_LISA_P
+map_LISA_P_inc
 dev.off()
 
 ## ----Local_Morans_i_Scatter_Plot------------------------------------
@@ -658,64 +788,64 @@ summary(r)
 pm.income.poly <- extract(r, income.tracts.t, fun=mean, sp=TRUE)
 pm.income.poly
 
-## ----Summary_pm.incom.poly-----------------------------------------------
+## ----Summary_pm.incom.poly------------------------------------------
 class(pm.income.poly) # [1] "SpatialPolygonsDataFrame"
 head(pm.income.poly)
 summary(pm.income.poly)  # var1.pred has NA's 115
 
-## ----Summary_pm.incom.poly$layer-----------------------------------------
+## ----Summary_pm.incom.poly$layer------------------------------------
 class(pm.income.poly$var1.pred) # [1] "numeric"
 head(pm.income.poly$var1.pred)
 summary(pm.income.poly$var1.pred) # NA's 115
 
-## ----Info_about_pm.income.poly$layer-------------------------------------
+## ----Info_about_pm.income.poly$layer--------------------------------
 str(pm.income.poly$var1.pred)
 pm.income.poly$var1.pred
 
-## ----Remove_nas_pm.income.poly$layer-------------------------------------
+## ----Remove_nas_pm.income.poly$layer--------------------------------
 pm.income.poly <- pm.income.poly[!is.na(pm.income.poly$var1.pred),] 
 summary(pm.income.poly)  # NA's 0
 
-## ----More_info_about_pm.income.poly--------------------------------------
+## ----More_info_about_pm.income.poly---------------------------------
 class(pm.income.poly) # [1] "SpatialPolygonsDataFrame"
 head(pm.income.poly)
 class(pm.income.poly$var1.pred) # [1] "numeric"
 names(pm.income.poly)  # names of columns
 
-## ----Rename_pm.income.poly$layer-----------------------------------------
+## ----Rename_pm.income.poly$layer------------------------------------
 names(pm.income.poly)[names(pm.income.poly) == "var1.pred"] <- "PM25.mean"
 names(pm.income.poly)  # names of columns
 
 summary(pm.income.poly)
 
-## ----Head_columns_Income_PM25.mean---------------------------------------
+## ----Head_columns_Income_PM25.mean----------------------------------
 head(pm.income.poly$Income)
 head(pm.income.poly$PM25.mean)
 
-## ----Class_columns_Income_PM25.mean--------------------------------------
+## ----Class_columns_Income_PM25.mean---------------------------------
 # Both PM2.5 and Income are stored in a dataset called pm.income.poly.
 class(pm.income.poly$PM25.mean) # [1] "numeric"
 class(pm.income.poly$Income)
 nrow(pm25.spatial) # 57870
 
-## ----Summary_pm.income.poly_columns--------------------------------------
+## ----Summary_pm.income.poly_columns---------------------------------
 summary(pm.income.poly$Income)
 summary(pm.income.poly$PM25.mean)
 summary(pm.income.poly)
 
-## ----Plot_data_columns_Income_PM25---------------------------------------
+## ----Plot_data_columns_Income_PM25----------------------------------
 plot(pm.income.poly$Income~pm.income.poly$PM25.mean, main = "Plot of Income ~ PM2.5 Mean")
 png("pm.income.poly_Income_PM25.mean.png")
 plot(pm.income.poly$Income~pm.income.poly$PM25.mean, main = "Plot of Income ~ PM2.5 Mean")
 dev.off()
 
-## ----Regression_model_1--------------------------------------------------
+## ----Regression_model_1---------------------------------------------
 lm.model.1 <- lm(pm.income.poly$Income~pm.income.poly$PM25.mean)
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------
 summary(lm.model.1)
 
-## ----Plot_of_income_PM25_abline-----------------------------------------
+## ----Plot_of_income_PM25_abline-------------------------------------
 plot(pm.income.poly$Income~pm.income.poly$PM25.mean, main = "Plot of Income ~ PM2.5 Mean")
 abline(lm.model.1, col="red", lw=2,lty=2)
 
@@ -724,20 +854,20 @@ plot(pm.income.poly$Income~pm.income.poly$PM25.mean, main = "Plot of Income ~ PM
 abline(lm.model.1, col="red", lw=2, lty=2)
 dev.off()
 
-## ----Get_residuals_from_model1-------------------------------------------
+## ----Get_residuals_from_model1--------------------------------------
 model.1.resids <- as.data.frame(residuals.lm(lm.model.1))
 
-## ----Add_residuals1_to_spatialpolygondataframe---------------------------
+## ----Add_residuals1_to_spatialpolygondataframe----------------------
 pm.income.poly$residuals1 <- residuals.lm(lm.model.1)
 
-## ----Observe_result_add_residuals_to_spatialpolygondataframe-------------
+## ----Observe_result_add_residuals_to_spatialpolygondataframe--------
 head(pm.income.poly)
 
-## ----Names_pm.income.poly------------------------------------------------
+## ----Names_pm.income.poly-------------------------------------------
 head(pm.income.poly)
 names(pm.income.poly)
 
-## ----Map_residuals1_PM25_data_with_sample--------------------------------
+## ----Map_residuals1_PM25_data_with_sample---------------------------
 map_pm25_vit.data_regress_residuals1 <- tm_shape(pm.income.poly) + 
   tm_polygons(col = "residuals1", 
               title = "Regression Residuals1", 
@@ -761,15 +891,9 @@ png("map_pm25_vit.data_regress_residuals1.noDot.png")
 map_pm25_vit.data_regress_residuals1
 dev.off()
 
-## ----After_regression_info_pm.income.poly--------------------------------
+## ----After_regression_info_pm.income.poly---------------------------
 summary(pm.income.poly)
 pm.income.poly
-
-## ----Plot_data_columns_residuals1_PM25---------------------------------------
-plot(pm.income.poly$residuals1~pm.income.poly$PM25.mean, main = "Plot of Income ~ PM2.5 Mean")
-png("pm.income.poly_residuals1_PM25.mean.png")
-plot(pm.income.poly$residuals1~pm.income.poly$PM25.mean, main = "Plot of Income ~ PM2.5 Mean")
-dev.off()
 
 ######################################################################
 ## ------------- Autocorrelation Moran's I (after regression) ----- ##
@@ -804,7 +928,7 @@ print.listw(vit.lw, zero.policy = TRUE)
 pm.income.poly$IncLagMeans = lag.listw(vit.lw, pm.income.poly$residuals, zero.policy = TRUE)
 
 ## -------------------------------------------------------------------
-map_LagMean <- tm_shape(pm.income.poly) + 
+map_LagMean_res <- tm_shape(pm.income.poly) + 
   tm_polygons(col = "IncLagMeans", 
               title = "Median 2016 $ Income\nLagged Means", 
               style = "fisher", 
@@ -815,11 +939,11 @@ map_LagMean <- tm_shape(pm.income.poly) +
   tm_compass(position = c("LEFT", "BOTTOM")) + 
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) + 
   tm_layout(title = "Metro Vancouver Census Tracts 2016 Residuals Lagged Means \n Income ~ PM2.5 (after Regression)", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .13, .03))
-map_LagMean
+map_LagMean_res
 ## Use "fisher" instead of "jenks" for larger data sets
 
 png("map_LagMean_vit_Income_afterRegression.png")  
-map_LagMean
+map_LagMean_res
 dev.off()
 
 ## -------------------------------------------------------------------
@@ -863,7 +987,7 @@ pm.income.poly$Po <- (pm.income.poly$P * 2) > 0.05
 pm.income.poly$Po
 
 ## -------------------------------------------------------------------
-map_LISA <- tm_shape(pm.income.poly) + 
+map_LISA_res <- tm_shape(pm.income.poly) + 
   tm_polygons(col = "Ii", 
               title = "\nLocal Moran's i", 
               style = "fisher", 
@@ -873,16 +997,16 @@ map_LISA <- tm_shape(pm.income.poly) +
   tm_compass(position = c("LEFT", "BOTTOM")) + 
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) +  
   tm_layout(title = "Metro Vancouver Census Tracts 2016 Income ~ PM2.5 \nLocal Moran's i Residuals (after Regression)", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .17, .03))
-map_LISA
+map_LISA_res
 ## Use "fisher" instead of "jenks" for larger data sets
 
 png("map_LISA_vit_Income_afterRegression.png")  
-map_LISA
+map_LISA_res
 dev.off()
 
 ## -------------------------------------------------------------------
 # > use manual breaks
-map_LISA_Z <- tm_shape(pm.income.poly) + 
+map_LISA_Z_res <- tm_shape(pm.income.poly) + 
   tm_polygons(col = "Z.Ii", 
               title = "\nLocal Moran's i Z values", 
               breaks = c(-Inf, -2.326, -1.96, 1.96, 2.326, Inf ),
@@ -892,14 +1016,14 @@ map_LISA_Z <- tm_shape(pm.income.poly) +
   tm_compass(position = c("LEFT", "BOTTOM")) + 
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) +  
   tm_layout(title = "Metro Vancouver Census Tracts 2016 Income ~ PM2.5 \nLocal Moran's i Residuals Z values \n(after Regression)", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .17, .03))
-map_LISA_Z
+map_LISA_Z_res
 
 png("map_LISA_vit_Income_Z_afterRegression.png")  
-map_LISA_Z
+map_LISA_Z_res
 dev.off()
 
 ## -------------------------------------------------------------------
-map_LISA_P <- tm_shape(pm.income.poly) + 
+map_LISA_P_res <- tm_shape(pm.income.poly) + 
   tm_polygons(col = "P", 
               title = "\nLocal Moran's i P values",
               breaks = c(0, 0.001, 0.01, 0.05, Inf ),  # 95% p=0.05
@@ -909,10 +1033,10 @@ map_LISA_P <- tm_shape(pm.income.poly) +
   tm_compass(position = c("LEFT", "BOTTOM")) + 
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) +  
   tm_layout(title = "Metro Vancouver Census Tracts 2016 Income ~ PM2.5 \nLocal Moran's i Residuals P values \n(after Regression)", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .17, .03))
-map_LISA_P
+map_LISA_P_res
 
 png("map_LISA_vit_Income_P_afterRegression.png")  
-map_LISA_P
+map_LISA_P_res
 dev.off()
 
 ## -------------------------------------------------------------------
@@ -1023,142 +1147,46 @@ map_gwr_coefficient
 dev.off()
 
 ######################################################################
-## ------------- Point Pattern Analysis --------------------------- ##
-######################################################################
-## ----spSample_info_PPA----------------------------------------------
-head(spSample)
-summary(spSample)
-
-## ----Coordinates_added_to_spSample----------------------------------
-spSample$x <- coordinates(spSample)[,1]
-spSample$y <- coordinates(spSample)[,2]
-
-## ----Finds_zero_distance_among_points-------------------------------
-zd <- zerodist(spSample)
-
-## ----Check_for_and_remove_duplicated_points-------------------------
-spSample <- remove.duplicates(spSample)
-spSample
-
-## -------------------------------------------------------------------
-spSample.ext <- as.matrix(extent(spSample)) 
-
-## ----Observation_window---------------------------------------------
-window <- as.owin(list(xrange = spSample.ext[1,], yrange = spSample.ext[2,]))
-
-## ----Create_ppp_object_from_spatstat--------------------------------
-spSample.ppp <- ppp(x = spSample$x, y = spSample$y, window = window)
-spSample.ppp
-
-## ----Number_quads---------------------------------------------------
-quads <- 10
-
-## ----Count_number_of_quads------------------------------------------
-qcount <- quadratcount(spSample.ppp, nx = quads, ny = quads)
-qcount
-
-## ----Create_dataframe_for_quadcount---------------------------------
-qcount.df <- as.data.frame(qcount)
-qcount.df
-
-## ----Count_number_of_quadrats_with_distinct_number_of_points--------
-qcount.df <- plyr::count(qcount.df,'Freq')
-qcount.df
-
-## --Change_column_names_to_xnumber_points_and_frequency_of_quadrats -
-colnames(qcount.df) <- c("x","f")
-qcount.df
-
-## -------------------------------------------------------------------
-qcount.df$x
-qcount.df$f
-
-X2 <- qcount.df$x ^ 2
-X2
-
-sum.f.x2 <- sum(qcount.df$f * qcount.df$x ^ 2)
-sum.f.x2
-
-M <- sum(qcount.df$f)
-M
-
-N <- sum(qcount.df$x * qcount.df$f)
-N
-
-sum.fx.2 <- (sum(qcount.df$f * qcount.df$x))^2
-sum.fx.2
-
-VAR <- (sum.f.x2 -(sum.fx.2/M))/M-1
-VAR
-
-MEAN <- N / M
-MEAN
-
-VMR <- VAR / MEAN
-VMR
-
-## ----Chi_square_test_for_random_spatial_pattern---------------------
-chi.square = VMR *(M - 1)
-p = 1 - pchisq(chi.square, (M - 1))
-p  
-
-## ----Add_NND_Stats_data_objects_4_to_data.frame---------------------
-data.for.table4 = data.frame(qcount.df$x, qcount.df$f, X2, n, nnd, sum.f.x2, M, N, sum.fx.2, VAR, MEAN, VMR, p)
-data.for.table4
-
-## ----write_csv_datatable4_NND--------------------------------------
-write.csv(data.for.table4, "NND.data.for.table4.csv", row.names = FALSE)
-
-## ----Calculate_nearestNeighbour-------------------------------------
-nearestNeighbour <- nndist(spSample.ppp)
-nearestNeighbour
-
-## ----Convert_nearestNeighbor_object_into_dataframe------------------
-nearestNeighbour=as.data.frame(as.numeric(nearestNeighbour))
-nearestNeighbour
-
-## ----Nearest_Neighbour_info-----------------------------------------
-class(nearestNeighbour)
-head(nearestNeighbour)
-
-## ----Change_column_name_to_Distance---------------------------------
-colnames(nearestNeighbour) = "Distance"
-head(nearestNeighbour)
-
-n <- nrow(nearestNeighbour)
-n  
-
-nnd <- sum(nearestNeighbour$Distance) / n
-nnd 
-
-studyArea <- gArea(spgeom = income.tracts.t, byid = FALSE)
-studyArea
-
-pointDensity <- n / studyArea
-pointDensity 
-
-r.nnd <- 1/(2*sqrt(pointDensity))
-r.nnd
-
-d.nnd <- 1.07453 / pointDensity^(1/2)
-d.nnd
-
-R <- nnd / r.nnd
-R 
-
-SE.NND <- 0.26136 / (n * pointDensity)^(1/2)
-SE.NND  
-
-z <-  (nnd - r.nnd) / SE.NND
-z  
-
-## ----Add_NND_Stats_data_objects_5_to_data.frame---------------------
-data.for.table5 = data.frame(n, nnd, studyArea, pointDensity, r.nnd, d.nnd, R, SE.NND, z)
-data.for.table5
-
-## ----create_csv_datatable5_PPA--------------------------------------
-write.csv(data.for.table5, "PPA.data.for.table5.csv", row.names = FALSE)
-
-######################################################################
 ## ------------- End Spatial Analysis ----------------------------- ##
 ######################################################################
+
+## ------------- Interactive View of Maps ----------------------------
+# for interactive view of polygon data
+## turn on view mode
+## turn off interactivity using tmap_mode("plot")
+tmap_mode("view")
+
+### run map object; click polygon to see data
+map_MdInc.t               # Median Income by postal code polygon
+map_pm25_vit.data_medInc  # with 100 sample data points
+map_LagMean_inc
+map_LISA_Inc
+map_LISA_Z_Inc
+map_LISA_P_Inc
+KO_PM25_predict_f0_Exp
+KO_PM25_variance_f0_Exp
+KO_PM25_CI_f0_Exp
+map_pm25_vit.data_regress_residuals1
+map_LagMean_res
+map_LISA_res
+map_LISA_Z_res
+map_LISA_P_res
+map_gwr_r_square
+map_gwr_coefficient
+
+## return to plot mode
+tmap_mode("plot")
+
+## ------- Summary Stats ---------------------------------------------
+summary(income.tracts.t)
+summary(income.pm25)
+summary(pm25.points.aggregate)
+summary(spSample)
+summary(pm.income.poly)
+summary(local.coefficient)
+summary(lm.model.1)
+summary(model.1.resids)
+summary(results)
+
+## ------- That's it! ------------------------------------------------
+
