@@ -1,7 +1,7 @@
 ######################################################################
 ## -------- Metro Vancouver Income~PM25 Spatial Analysis ---------- ##
 ## --------------------- Wendy Anthony ---------------------------- ##
-## ----------------- Geog 418 B02  2019-12-04 --------------------- ##
+## ----------------- Geog 418 B02  2019-12-06 --------------------- ##
 ######################################################################
 
 ## ----Set_Working_Directory
@@ -49,7 +49,7 @@ head(pm25) # check new column names
 ## ----Read_in_postal_code_shapefile_data-----------------------------
 ## Dataset II. BC Postal Codes
 postalcodes <- shapefile("./BC_PostalCodes/BC_Postal_Codes.shp")
- 
+
 ## ----Projection_of_postalcodes_data_to_BCAlbers---------------------
 crs(postalcodes)
 postalcodes.t <- spTransform(postalcodes, CRS("+init=epsg:3005"))
@@ -233,91 +233,91 @@ summary(spSample)
 
 ## ----Mean_calc------------------------------------------------------
 mean.income.tracts.t.Income <- mean(income.tracts.t$Income)  # used by Moran's i
-mean.income.tracts.t.Income # [1] 33868
+mean.income.tracts.t.Income 
 mean.income.pm25.PM25AGG <- mean(income.pm25$PM25AGG)
-mean.income.pm25.PM25AGG # [1] 2.13386
+mean.income.pm25.PM25AGG 
 
 mean.spSample.Income <- mean(spSample$Income)
-mean.spSample.Income # [1] 36021.82
+mean.spSample.Income 
 mean.spSample.PM25AGG <- mean(spSample$PM25AGG)
-mean.spSample.PM25AGG # [1] 1.996
+mean.spSample.PM25AGG 
 
 ## ----SD_calc--------------------------------------------------------
 sd.income.tracts.t.Income <- sd(income.tracts.t$Income)
-sd.income.tracts.t.Income # [1] 8835.894
+sd.income.tracts.t.Income
 sd.income.pm25.PM25AGG <- sd(income.pm25$PM25AGG)
-sd.income.pm25.PM25AGG # [1] 1.509542
+sd.income.pm25.PM25AGG 
 
 sd.spSample.Income <- sd(spSample$Income)
-sd.spSample.Income # [1] 9416.431
+sd.spSample.Income 
 sd.spSample.PM25AGG <- sd(spSample$PM25AGG)
-sd.spSample.PM25AGG # [1] 1.491316
+sd.spSample.PM25AGG 
 
 ## ----Mode_calc------------------------------------------------------
 mode.income.tracts.t.Income <- as.numeric(names(sort(table(income.tracts.t$Income), decreasing = TRUE))[1])
-mode.income.tracts.t.Income # [1] 34176
+mode.income.tracts.t.Income
 mode.income.pm25.PM25AGG <- as.numeric(names(sort(table(income.pm25$PM25AGG), decreasing = TRUE))[1])
-mode.income.pm25.PM25AGG # [1] 0.1
+mode.income.pm25.PM25AGG 
 
 mode.spSample.Income <- as.numeric(names(sort(table(spSample$Income), decreasing = TRUE))[1])
-mode.income.tracts.t.Income # [1] 34176
+mode.income.tracts.t.Income
 mode.spSample.PM25AGG <- as.numeric(names(sort(table(spSample$PM25AGG), decreasing = TRUE))[1])
-mode.spSample.PM25AGG # [1] 0.1
+mode.spSample.PM25AGG 
 
 ## ----Median_calc----------------------------------------------------
 med.income.tracts.t.Income <- median(income.tracts.t$Income, na.rm = TRUE)
-med.income.tracts.t.Income # [1] 33152
+med.income.tracts.t.Income 
 med.income.pm25.PM25AGG <- median(income.pm25$PM25AGG, na.rm = TRUE)
-med.income.pm25.PM25AGG # [1] 2
+med.income.pm25.PM25AGG 
 
 med.spSample.Income <- median(spSample$Income, na.rm = TRUE)
-med.spSample.Income # [1] 34752
+med.spSample.Income 
 med.spSample.PM25AGG <- median(spSample$PM25AGG, na.rm = TRUE)
-med.spSample.PM25AGG # [1] 1.8
+med.spSample.PM25AGG 
 
 ## ----Skewness_calc--------------------------------------------------
 skew.income.tracts.t.Income <- skewness(income.tracts.t$Income, na.rm = TRUE)[1]
-skew.income.tracts.t.Income # [1] 0.4087659
+skew.income.tracts.t.Income 
 skew.income.pm25.PM25AGG <- skewness(income.pm25$PM25AGG, na.rm = TRUE)[1]
-skew.income.pm25.PM25AGG # [1] 0.2479925
+skew.income.pm25.PM25AGG 
 
 skew.spSample.Income <- skewness(spSample$Income, na.rm = TRUE)[1]
-skew.spSample.Income # [1] 0.4296544
+skew.spSample.Income 
 skew.spSample.PM25AGG <- skewness(spSample$PM25AGG, na.rm = TRUE)[1]
-skew.spSample.PM25AGG # [1] 0.3529682
+skew.spSample.PM25AGG 
 
 ## ----Kurtosis_calc--------------------------------------------------
 kurt.income.tracts.t.Income <- kurtosis(income.tracts.t$Income, na.rm = TRUE)[1]
-kurt.income.tracts.t.Income # [1] 2.902638
+kurt.income.tracts.t.Income 
 kurt.income.pm25.PM25AGG <- kurtosis(income.pm25$PM25AGG, na.rm = TRUE)[1]
-kurt.income.pm25.PM25AGG # [1] 2.044512
+kurt.income.pm25.PM25AGG 
 
 kurt.spSample.Income <- kurtosis(spSample$Income, na.rm = TRUE)[1]
-kurt.spSample.Income # [1] 2.328493
+kurt.spSample.Income 
 kurt.spSample.PM25AGG <- kurtosis(spSample$PM25AGG, na.rm = TRUE)[1]
-kurt.spSample.PM25AGG # [1] 2.05602
+kurt.spSample.PM25AGG 
 
 ## ----CoV_calc-------------------------------------------------------
 CoV.income.tracts.t.Income <- (sd.income.tracts.t.Income / mean.income.tracts.t.Income) * 100
-CoV.income.tracts.t.Income # [1] 26.08921
+CoV.income.tracts.t.Income 
 CoV.income.pm25.PM25AGG <- (sd.income.pm25.PM25AGG / mean.income.pm25.PM25AGG) * 100
-CoV.income.pm25.PM25AGG # [1] 70.7423
+CoV.income.pm25.PM25AGG 
 
 CoV.spSample.Income <- (sd.spSample.Income / mean.spSample.Income) * 100
-CoV.spSample.Income # [1] 26.14091
+CoV.spSample.Income 
 CoV.spSample.PM25AGG <- (sd.spSample.PM25AGG / mean.spSample.PM25AGG) * 100
-CoV.spSample.PM25AGG # [1] 74.71524
+CoV.spSample.PM25AGG 
 
 ## ----Normal_dist_calc-----------------------------------------------
 norm.income.tracts.t.Income_PVAL <- shapiro.test(income.tracts.t$Income)$p.value
-norm.income.tracts.t.Income_PVAL # [1] 7.991269e-20
+norm.income.tracts.t.Income_PVAL 
 norm.income.pm25.PM25AGG_PVAL <- shapiro.test(income.pm25$PM25AGG)$p.value
-norm.income.pm25.PM25AGG_PVAL # [1] 6.341768e-34
+norm.income.pm25.PM25AGG_PVAL 
 
 norm.spSample.Income_PVAL <- shapiro.test(spSample$Income)$p.value
-norm.spSample.Income_PVAL # [1] 0.005087551
+norm.spSample.Income_PVAL 
 norm.spSample.PM25AGG_PVAL <- shapiro.test(spSample$PM25AGG)$p.value
-norm.spSample.PM25AGG_PVAL # [1] 7.730187e-05
+norm.spSample.PM25AGG_PVAL
 
 ## ----Label_object---------------------------------------------------
 Samples <- c("Income (All)", "Income (Sample)", "PM2.5 (All)", "PM2.5 (Sample)") 
@@ -395,65 +395,6 @@ window <- as.owin(list(xrange = spSample.ext[1,], yrange = spSample.ext[2,]))
 spSample.ppp <- ppp(x = spSample$x, y = spSample$y, window = window)
 spSample.ppp
 
-## ----Number_quads---------------------------------------------------
-quads <- 10
-
-## ----Count_number_of_quads------------------------------------------
-qcount <- quadratcount(spSample.ppp, nx = quads, ny = quads)
-qcount
-
-## ----Create_dataframe_for_quadcount---------------------------------
-qcount.df <- as.data.frame(qcount)
-qcount.df
-
-## ----Count_number_of_quadrats_with_distinct_number_of_points--------
-qcount.df <- plyr::count(qcount.df,'Freq')
-qcount.df
-
-## --Change_column_names_to_xnumber_points_and_frequency_of_quadrats -
-colnames(qcount.df) <- c("x","f")
-qcount.df
-
-## -------------------------------------------------------------------
-qcount.df$x
-qcount.df$f
-
-X2 <- qcount.df$x ^ 2
-X2
-
-sum.f.x2 <- sum(qcount.df$f * qcount.df$x ^ 2)
-sum.f.x2
-
-M <- sum(qcount.df$f)
-M
-
-N <- sum(qcount.df$x * qcount.df$f)
-N
-
-sum.fx.2 <- (sum(qcount.df$f * qcount.df$x))^2
-sum.fx.2
-
-VAR <- (sum.f.x2 -(sum.fx.2/M))/M-1
-VAR
-
-MEAN <- N / M
-MEAN
-
-VMR <- VAR / MEAN
-VMR
-
-## ----Chi_square_test_for_random_spatial_pattern---------------------
-chi.square = VMR *(M - 1)
-p = 1 - pchisq(chi.square, (M - 1))
-p  
-
-## ----Add_NND_Stats_data_objects_4_to_data.frame---------------------
-data.for.table4 = data.frame(qcount.df$x, qcount.df$f, X2, n, nnd, sum.f.x2, M, N, sum.fx.2, VAR, MEAN, VMR, p)
-data.for.table4
-
-## ----write_csv_datatable4_NND--------------------------------------
-write.csv(data.for.table4, "NND.data.for.table4.csv", row.names = FALSE)
-
 ## ----Calculate_nearestNeighbour-------------------------------------
 nearestNeighbour <- nndist(spSample.ppp)
 nearestNeighbour
@@ -501,8 +442,8 @@ z
 data.for.table5 = data.frame(n, nnd, studyArea, pointDensity, r.nnd, d.nnd, R, SE.NND, z)
 data.for.table5
 
-## ----create_csv_datatable5_PPA--------------------------------------
-write.csv(data.for.table5, "PPA.data.for.table5.csv", row.names = FALSE)
+## ----create_csv_datatable5_NND--------------------------------------
+write.csv(data.for.table5, "NND.data.for.table5.csv", row.names = FALSE)
 
 ######################################################################
 ## ---------------- Autocorrelation Moran's I --------------------- ##
@@ -526,9 +467,12 @@ dev.off()
 ## ----Creating_Neighbourhood_Weights_Matrix--------------------------
 vit.lw <- nb2listw(vit.nb, zero.policy = TRUE, style = "W")
 print.listw(vit.lw, zero.policy = TRUE)
+AutoCorr_beforeReg_print.listw <- print.listw(vit.lw, zero.policy = TRUE)
 
 ## ----Calculate_Lag_Means--------------------------------------------
 income.tracts.t$IncLagMeans = lag.listw(vit.lw, income.tracts.t$Income, zero.policy = TRUE)
+
+BeforeReg.IncLagMeans <- income.tracts.t$IncLagMeans
 
 ## ----Map_Lagged_Means-----------------------------------------------
 ## Use "fisher" instead of "jenks" for larger data sets
@@ -558,6 +502,7 @@ moran.range <- function(lw) {
   return(range(eigen((wmat + t(wmat))/2)$values))
 }
 moran.range(vit.lw)
+moran.range.beforeReg <- moran.range(vit.lw)
 
 mI <- mi$estimate[[1]]
 eI <- mi$estimate[[2]]
@@ -577,16 +522,6 @@ income.tracts.t$E.Ii<- lisa.test[,2]
 income.tracts.t$Var.Ii<- lisa.test[,3]
 income.tracts.t$Z.Ii<- lisa.test[,4]
 income.tracts.t$P<- lisa.test[,5]
-
-## --z_Ii_values_test_FALSE_if_z_less_0.95_if_Ii_less_0_negative--
-income.tracts.t$Z.Ho <- income.tracts.t$Z.Ii < 1.96
-
-## ----Ii_value_lessthan0_negative------------------------------------
-income.tracts.t$Ii.Neg <- income.tracts.t$Ii < 0
-
-## ----P_onetail_value_test_multiply_by_2_for_twotail-----------------
-income.tracts.t$Po <- (income.tracts.t$P * 2) > 0.05
-income.tracts.t$Po
 
 ## ----Info_about_income.tracts_Lisa----------------------------------
 income.tracts.t
@@ -788,15 +723,15 @@ summary(r)
 pm.income.poly <- extract(r, income.tracts.t, fun=mean, sp=TRUE)
 pm.income.poly
 
-## ----Summary_pm.incom.poly------------------------------------------
-class(pm.income.poly) # [1] "SpatialPolygonsDataFrame"
+## ----Summary_pm.income.poly------------------------------------------
+class(pm.income.poly) 
 head(pm.income.poly)
-summary(pm.income.poly)  # var1.pred has NA's 115
+summary(pm.income.poly)
 
-## ----Summary_pm.incom.poly$layer------------------------------------
+## ----Summary_pm.income.poly$var1.pred------------------------------------
 class(pm.income.poly$var1.pred) # [1] "numeric"
 head(pm.income.poly$var1.pred)
-summary(pm.income.poly$var1.pred) # NA's 115
+summary(pm.income.poly$var1.pred) # NA's 
 
 ## ----Info_about_pm.income.poly$layer--------------------------------
 str(pm.income.poly$var1.pred)
@@ -862,9 +797,6 @@ pm.income.poly$residuals1 <- residuals.lm(lm.model.1)
 
 ## ----Observe_result_add_residuals_to_spatialpolygondataframe--------
 head(pm.income.poly)
-
-## ----Names_pm.income.poly-------------------------------------------
-head(pm.income.poly)
 names(pm.income.poly)
 
 ## ----Map_residuals1_PM25_data_with_sample---------------------------
@@ -875,15 +807,11 @@ map_pm25_vit.data_regress_residuals1 <- tm_shape(pm.income.poly) +
               palette = "viridis", n = 6,
               border.col = "grey", 
               border.alpha = 0.05) +
-  #tm_shape(spSample) +
-  #tm_dots(col="PM25AGG", palette = "Reds", n=5,
-          title="Sampled PM2.5 \n(ug/m^3)", size=0.08) + 
   tm_legend(legend.outside=FALSE, position = c(0.01, 0.01)) + 
   tm_layout(inner.margins = c(.12, .17, .15, .03), title = "Metro Vancouver 2016 Census Tracts\nIncome ~ PM2.5 Regression Residuals1", title.position = c("LEFT", "TOP")) + 
   tm_scale_bar(position = c(0.4, 0.05)) +  
   tm_compass(type= "4star", position=c("RIGHT", "TOP")) 
 # Use "fisher" instead of "jenks" for larger data sets
-
 map_pm25_vit.data_regress_residuals1
 
 #create png
@@ -923,13 +851,17 @@ dev.off()
 ## -------------------------------------------------------------------
 vit.lw <- nb2listw(vit.nb, zero.policy = TRUE, style = "W")
 print.listw(vit.lw, zero.policy = TRUE)
+AutoCorr_afterReg_print.listw <- print.listw(vit.lw, zero.policy = TRUE)
 
 ## -------------------------------------------------------------------
-pm.income.poly$IncLagMeans = lag.listw(vit.lw, pm.income.poly$residuals, zero.policy = TRUE)
+pm.income.poly$IncLagMeans.res = lag.listw(vit.lw, pm.income.poly$residuals1, zero.policy = TRUE)
+head(pm.income.poly)
+
+AfterReg.IncLagMeans <- pm.income.poly$IncLagMeans.res
 
 ## -------------------------------------------------------------------
 map_LagMean_res <- tm_shape(pm.income.poly) + 
-  tm_polygons(col = "IncLagMeans", 
+  tm_polygons(col = "IncLagMeans.res", 
               title = "Median 2016 $ Income\nLagged Means", 
               style = "fisher", 
               palette = "viridis", n = 6,
@@ -947,7 +879,7 @@ map_LagMean_res
 dev.off()
 
 ## -------------------------------------------------------------------
-mi <- moran.test(pm.income.poly$residuals, vit.lw, zero.policy = TRUE)
+mi <- moran.test(pm.income.poly$residuals1, vit.lw, zero.policy = TRUE)
 mi
 
 ## -------------------------------------------------------------------
@@ -956,6 +888,7 @@ moran.range <- function(lw) {
   return(range(eigen((wmat + t(wmat))/2)$values))
 }
 moran.range(vit.lw)  
+moran.range.afaterReg <- moran.range(vit.lw)
 
 ## -------------------------------------------------------------------
 mI <- mi$estimate[[1]]
@@ -968,7 +901,7 @@ data.for.table1 = data.frame(mI, eI, var, z)
 write.csv(data.for.table1, "moransGlobal_vit_Income_afterRegression.csv", row.names = FALSE)
 
 ## ----Lisa_Test_afterRegression--------------------------------------
-lisa.test <- localmoran(pm.income.poly$residuals, vit.lw)
+lisa.test <- localmoran(pm.income.poly$residuals1, vit.lw)
 
 ## -------------------------------------------------------------------
 pm.income.poly$Ii <- lisa.test[,1]
@@ -1187,6 +1120,12 @@ summary(local.coefficient)
 summary(lm.model.1)
 summary(model.1.resids)
 summary(results)
+
+AutoCorr_beforeReg_print.listw
+AutoCorr_afterReg_print.listw
+
+BeforeReg.IncLagMeans
+BeforeReg.IncLagMeans <- pm.income.poly$IncLagMeans.res
 
 ## ------- That's it! ------------------------------------------------
 
