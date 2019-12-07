@@ -467,12 +467,12 @@ dev.off()
 ## ----Creating_Neighbourhood_Weights_Matrix--------------------------
 vit.lw <- nb2listw(vit.nb, zero.policy = TRUE, style = "W")
 print.listw(vit.lw, zero.policy = TRUE)
-AutoCorr_beforeReg_print.listw <- print.listw(vit.lw, zero.policy = TRUE)
+AutoCorr_beforeReg_print.listw_2 <- print.listw(vit.lw, zero.policy = TRUE)
 
 ## ----Calculate_Lag_Means--------------------------------------------
 income.tracts.t$IncLagMeans = lag.listw(vit.lw, income.tracts.t$Income, zero.policy = TRUE)
 
-BeforeReg.IncLagMeans <- income.tracts.t$IncLagMeans
+BeforeReg.IncLagMeans_2 <- income.tracts.t$IncLagMeans
 
 ## ----Map_Lagged_Means-----------------------------------------------
 ## Use "fisher" instead of "jenks" for larger data sets
@@ -1017,7 +1017,7 @@ local.r.square_2 <- pm.income.poly$localr_2
 
 ## ----Map_r_square---------------------------------------------------
 map_gwr_r_square_2 <- tm_shape(pm.income.poly) + 
-  tm_polygons(col = "localr", 
+  tm_polygons(col = "localr_2", 
               title = "\nGWR r^2",
               style = "fisher", 
               palette = "viridis", n = 4,
@@ -1035,16 +1035,16 @@ map_gwr_r_square_2
 dev.off()
 
 ## ----Results_Map_coefficients---------------------------------------
-# View(results)
-class(results)
-names(results)
-class(results$pm.income.poly.PM25.mean)
-head(results)
-results$pm.income.poly.PM25.mean
-summary(results$pm.income.poly.PM25.mean)
+# View(results_2)
+class(results_2)
+names(results_2)
+class(results_2$pm.income.poly.Income)
+head(results_2)
+results_2$pm.income.poly.Income
+summary(results_2$pm.income.poly.Income)
 
 ## ----Assign_coefficients--------------------------------------------
-pm.income.poly$coeff <- results$pm.income.poly.PM25.mean
+pm.income.poly$coeff <- results_2$pm.income.poly.Income
 head(pm.income.poly)
 summary(pm.income.poly$coeff)
 
@@ -1091,12 +1091,12 @@ KO_PM25_predict_f0_Exp
 KO_PM25_variance_f0_Exp
 KO_PM25_CI_f0_Exp
 map_pm25_vit.data_regress_residuals2
-map_LagMean_res
-map_LISA_res
-map_LISA_Z_res
-map_LISA_P_res
-map_gwr_r_square
-map_gwr_coefficient
+map_LagMean_res_2
+map_LISA_res_2
+map_LISA_Z_res_2
+map_LISA_P_res_2
+map_gwr_r_square_2
+map_gwr_coefficient_2
 
 ## return to plot mode
 tmap_mode("plot")
@@ -1110,13 +1110,12 @@ summary(pm.income.poly)
 summary(local.coefficient)
 summary(lm.model.2)
 summary(model.2.resids)
-summary(results)
+summary(results_2)
 
-AutoCorr_beforeReg_print.listw
-AutoCorr_afterReg_print.listw
+AutoCorr_beforeReg_print.listw_2
+AutoCorr_afterReg_print.listw_2
 
-BeforeReg.IncLagMeans
-BeforeReg.IncLagMeans <- pm.income.poly$IncLagMeans.res
+BeforeReg.IncLagMeans_2
 
 ## ------- That's it! ------------------------------------------------
 
