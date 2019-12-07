@@ -1,5 +1,5 @@
 ######################################################################
-## -------- Metro Vancouver Income~PM25 Spatial Analysis ---------- ##
+## -------- Metro Vancouver Income~PM2 5 Spatial Analysis --------- ##
 ## --------------------- Wendy Anthony ---------------------------- ##
 ## ----------------- Geog 418 B02  2019-12-06 --------------------- ##
 ######################################################################
@@ -138,7 +138,6 @@ fullgrid(grd)    <- TRUE  # Create SpatialGrid object
 proj4string(grd) <- proj4string(spSample)
 grd
 
-
 ## ----Create_inset_map_for_study_site_location_map-------------------
 ### ----Create_bc_spatial_map-----------------------------------------
 # needs libraries: bcmapsdata, bcmaps
@@ -153,8 +152,8 @@ bc
 ## ----Create_inset_map_for_study_site_location_map-------------------
 ### ----1_Main_Map----------------------------------------------------
 map_MV_ct <- tm_shape(income.tracts.t) + 
-  #tm_fill(col = "gray60") +  #fill polygons +
-  tm_borders("grey50", alpha=1, lwd=.21) +
+  tm_fill(col = "gray80") +  #fill polygons
+  tm_borders("grey5", alpha=1, lwd=.21) +
   tm_compass(position = c("RIGHT", "TOP")) + 
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) + 
   tm_layout(title = "Metro Vancouver Census Tracts 2016", title.position = c("center", "TOP"))
@@ -181,24 +180,7 @@ bc_region = st_bbox(c(xmin = 273435.7, xmax = 368702.7,
 ### ----4_Combine_map_inset_using_viewport_study_area_using_viewport_grid_package
 png("map_MV_CT_BC1_inset.png")
 map_MV_ct
-print(map_tm_bc1, vp = viewport(0.13, 0.33, width = 0.2, height = 0.2))
-dev.off()
-
-## ----Create_choropleth_map_of_income--------------------------------
-map_MdInc.t <- tm_shape(income.tracts.t) + 
-  tm_polygons(col = "Income", 
-              title = "Median Income", 
-              style = "fisher", 
-              palette = "viridis", n = 6,
-              border.col = "grey", 
-              border.alpha = 0.05) + 
-  tm_compass(position = c("LEFT", "BOTTOM")) + 
-  tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) + 
-  # add compass
-  tm_layout(title = "Metro Vancouver Census Tracts Median Income \n2016", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .08, .03))
-
-png("map_MdInc.t_income.tracts.t_fisher.png")  
-map_MdInc.t
+print(map_tm_bc1, vp = viewport(0.13, 0.33, width = 0.2, height = 0.5))
 dev.off()
 
 ## ----Create_choropleth_map_with_layer_of_sample_100_data_points------
@@ -214,7 +196,7 @@ map_pm25_vit.data_medInc <- tm_shape(income.tracts.t) +
           title="Sampled PM2.5 \n(ug/m^3)", size=0.08) + 
   tm_legend(legend.outside=FALSE, position = c(0.01, 0.01)) + 
   tm_layout(inner.margins = c(.15, .05, .15, .03), 
-            title = "Metro Vancouver 2016 Census Tracts\nMedian $ Income & Sampled PM2.5 Values", title.position = c("LEFT", "TOP")) + 
+            title = "         Metro Vancouver 2016 Census Tracts\nMedian $ Income & Sampled PM2.5 Values", title.position = c("LEFT", "TOP")) + 
   tm_scale_bar(position = c(0.4, 0.05)) + 
   tm_compass(type= "4star", position=c("RIGHT", "TOP"))
 
