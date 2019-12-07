@@ -1,5 +1,5 @@
 ######################################################################
-## -------- Metro Vancouver PM25~Income Spatial Analysis ---------- ##
+## -------- Metro Vancouver PM2.5~Income Spatial Analysis --------- ##
 ## --------------------- Wendy Anthony ---------------------------- ##
 ## ----------------- Geog 418 B02  2019-12-06 --------------------- ##
 ######################################################################
@@ -138,7 +138,6 @@ fullgrid(grd)    <- TRUE  # Create SpatialGrid object
 proj4string(grd) <- proj4string(spSample)
 grd
 
-
 ## ----Create_inset_map_for_study_site_location_map-------------------
 ### ----Create_bc_spatial_map-----------------------------------------
 # needs libraries: bcmapsdata, bcmaps
@@ -153,11 +152,11 @@ bc
 ## ----Create_inset_map_for_study_site_location_map-------------------
 ### ----1_Main_Map----------------------------------------------------
 map_MV_ct <- tm_shape(income.tracts.t) + 
-  #tm_fill(col = "gray60") +  #fill polygons +
-  tm_borders("grey50", alpha=1, lwd=.21) +
+  tm_fill(col = "gray80") +  #fill polygons
+  tm_borders("grey5", alpha=1, lwd=.21) +
   tm_compass(position = c("RIGHT", "TOP")) + 
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) + 
-  tm_layout(title = "Metro Vancouver Census Tracts 2016", title.position = c("center", "TOP"))
+  tm_layout(title = "         Metro Vancouver Census Tracts 2016", title.position = c("center", "TOP"))
 map_MV_ct
 
 ## ----2_Create_inset_map_for_context_to_main_message_map-------------
@@ -181,7 +180,7 @@ bc_region = st_bbox(c(xmin = 273435.7, xmax = 368702.7,
 ### ----4_Combine_map_inset_using_viewport_study_area_using_viewport_grid_package
 png("map_MV_CT_BC1_inset.png")
 map_MV_ct
-print(map_tm_bc1, vp = viewport(0.13, 0.33, width = 0.2, height = 0.2))
+print(map_tm_bc1, vp = viewport(0.13, 0.33, width = 0.2, height = 0.5))
 dev.off()
 
 ## ----Create_choropleth_map_of_income--------------------------------
