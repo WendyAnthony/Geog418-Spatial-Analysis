@@ -1,3 +1,2 @@
 # Geog418-Spatial-Analysis
-Final-Project
-Metro Vancouver Median Income ~ PM2.5 Exposure
+A Spatial Analysis of Median Income and PM2.5 Exposure in Metro Vancouver
