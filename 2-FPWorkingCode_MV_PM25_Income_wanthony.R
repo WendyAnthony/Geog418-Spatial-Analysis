@@ -1,11 +1,12 @@
 ######################################################################
 ## -------- Metro Vancouver PM2.5~Income Spatial Analysis --------- ##
 ## --------------------- Wendy Anthony ---------------------------- ##
-## ----------------- Geog 418 B02  2019-12-06 --------------------- ##
+## ----------------- Geog 418 B02  2019-12-09 --------------------- ##
 ######################################################################
 
 ## ----Set_Working_Directory
-dir <- "/Users/wendyanthony/Documents/Geog418-AdvSpatialAnalysis/FinalProject/Working" # macBook
+# dir <- "/Users/wendyanthony/Documents/Geog418-AdvSpatialAnalysis/FinalProject/Working" # macBook
+dir <- "/Users/UVicCMC/Downloads/Working"
 setwd(dir)
 getwd()
 
@@ -103,14 +104,6 @@ pm25.aggregate <- aggregate((as.numeric(pm25.spatial$PM25)/10)~pm25.spatial$DAUI
 colnames(pm25.aggregate) <- c("DAUID", "PM25AGG") 
 head(pm25.aggregate)
 
-## ----Merge_income.t_and_pm25_aggregate_dissemination_data-----------
-income.pm25 <- merge(income.tracts.t, pm25.aggregate, by = "DAUID") 
-summary(income.pm25) 
-
-## ----Remove_na_income.pm25$PM25AGG----------------------------------
-income.pm25 <- income.pm25[!is.na(income.pm25$PM25AGG),] 
-summary(income.pm25) 
-
 ## ----Re-join_aggregated_data_to_pm25.spatial_points_layer-----------
 pm25.points.aggregate <- merge(pm25.spatial, pm25.aggregate, by = "DAUID")
 pm25.points.aggregate
@@ -147,7 +140,6 @@ grd
 bc <- as_Spatial(bc_neighbours()) #Get shp of BC bounds
 bc <- spTransform(bc, CRS("+init=epsg:3005")) #project to BC Albers
 bc <- bc[which(bc$name == "British Columbia" ),] #Extract just the BC province
-bc
 
 ## ----Create_inset_map_for_study_site_location_map-------------------
 ### ----1_Main_Map----------------------------------------------------
@@ -157,7 +149,6 @@ map_MV_ct <- tm_shape(income.tracts.t) +
   tm_compass(position = c("RIGHT", "TOP")) + 
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) + 
   tm_layout(title = "         Metro Vancouver Census Tracts 2016", title.position = c("center", "TOP"))
-map_MV_ct
 
 ## ----2_Create_inset_map_for_context_to_main_message_map-------------
 map_tm_bc1 <- tm_shape(bc) + # make the main shape
@@ -167,7 +158,6 @@ map_tm_bc1 <- tm_shape(bc) + # make the main shape
   #tm_shape(spSample) + # map_tm_bc (fewer PM2.5 sample points don't show up as much)
   tm_dots(col="PM25AGG", palette = "Greys", n=3) +
   tm_legend(show=FALSE)
-map_tm_bc1
 
 ## ----Create_inset_map_for_study_site_location_map-------------------
 ### ----3_Define_area_of_interest_create_spatial_object---------------
@@ -226,15 +216,14 @@ dev.off()
 ######################################################################
 ## ---------Summary_data----------------------------------------------
 summary(income.tracts.t)
-summary(income.pm25)
 summary(pm25.points.aggregate)
 summary(spSample)
 
 ## ----Mean_calc------------------------------------------------------
 mean.income.tracts.t.Income <- mean(income.tracts.t$Income)  # used by Moran's i
 mean.income.tracts.t.Income 
-mean.income.pm25.PM25AGG <- mean(income.pm25$PM25AGG)
-mean.income.pm25.PM25AGG 
+mean.pm25.points.aggregate.PM25AGG <- mean(pm25.points.aggregate$PM25AGG)
+mean.pm25.points.aggregate.PM25AGG 
 
 mean.spSample.Income <- mean(spSample$Income)
 mean.spSample.Income 
@@ -244,8 +233,8 @@ mean.spSample.PM25AGG
 ## ----SD_calc--------------------------------------------------------
 sd.income.tracts.t.Income <- sd(income.tracts.t$Income)
 sd.income.tracts.t.Income
-sd.income.pm25.PM25AGG <- sd(income.pm25$PM25AGG)
-sd.income.pm25.PM25AGG 
+sd.pm25.points.aggregate.PM25AGG <- sd(pm25.points.aggregate$PM25AGG)
+sd.pm25.points.aggregate.PM25AGG 
 
 sd.spSample.Income <- sd(spSample$Income)
 sd.spSample.Income 
@@ -255,8 +244,8 @@ sd.spSample.PM25AGG
 ## ----Mode_calc------------------------------------------------------
 mode.income.tracts.t.Income <- as.numeric(names(sort(table(income.tracts.t$Income), decreasing = TRUE))[1])
 mode.income.tracts.t.Income
-mode.income.pm25.PM25AGG <- as.numeric(names(sort(table(income.pm25$PM25AGG), decreasing = TRUE))[1])
-mode.income.pm25.PM25AGG 
+mode.pm25.points.aggregate.PM25AGG <- as.numeric(names(sort(table(pm25.points.aggregate$PM25AGG), decreasing = TRUE))[1])
+mode.pm25.points.aggregate.PM25AGG 
 
 mode.spSample.Income <- as.numeric(names(sort(table(spSample$Income), decreasing = TRUE))[1])
 mode.income.tracts.t.Income
@@ -266,8 +255,8 @@ mode.spSample.PM25AGG
 ## ----Median_calc----------------------------------------------------
 med.income.tracts.t.Income <- median(income.tracts.t$Income, na.rm = TRUE)
 med.income.tracts.t.Income 
-med.income.pm25.PM25AGG <- median(income.pm25$PM25AGG, na.rm = TRUE)
-med.income.pm25.PM25AGG 
+med.pm25.points.aggregate.PM25AGG <- median(pm25.points.aggregate$PM25AGG, na.rm = TRUE)
+med.pm25.points.aggregate.PM25AGG 
 
 med.spSample.Income <- median(spSample$Income, na.rm = TRUE)
 med.spSample.Income 
@@ -277,8 +266,8 @@ med.spSample.PM25AGG
 ## ----Skewness_calc--------------------------------------------------
 skew.income.tracts.t.Income <- skewness(income.tracts.t$Income, na.rm = TRUE)[1]
 skew.income.tracts.t.Income 
-skew.income.pm25.PM25AGG <- skewness(income.pm25$PM25AGG, na.rm = TRUE)[1]
-skew.income.pm25.PM25AGG 
+skew.pm25.points.aggregate.PM25AGG <- skewness(pm25.points.aggregate$PM25AGG, na.rm = TRUE)[1]
+skew.pm25.points.aggregate.PM25AGG 
 
 skew.spSample.Income <- skewness(spSample$Income, na.rm = TRUE)[1]
 skew.spSample.Income 
@@ -288,8 +277,8 @@ skew.spSample.PM25AGG
 ## ----Kurtosis_calc--------------------------------------------------
 kurt.income.tracts.t.Income <- kurtosis(income.tracts.t$Income, na.rm = TRUE)[1]
 kurt.income.tracts.t.Income 
-kurt.income.pm25.PM25AGG <- kurtosis(income.pm25$PM25AGG, na.rm = TRUE)[1]
-kurt.income.pm25.PM25AGG 
+kurt.pm25.points.aggregate.PM25AGG <- kurtosis(pm25.points.aggregate$PM25AGG, na.rm = TRUE)[1]
+kurt.pm25.points.aggregate.PM25AGG 
 
 kurt.spSample.Income <- kurtosis(spSample$Income, na.rm = TRUE)[1]
 kurt.spSample.Income 
@@ -299,8 +288,8 @@ kurt.spSample.PM25AGG
 ## ----CoV_calc-------------------------------------------------------
 CoV.income.tracts.t.Income <- (sd.income.tracts.t.Income / mean.income.tracts.t.Income) * 100
 CoV.income.tracts.t.Income 
-CoV.income.pm25.PM25AGG <- (sd.income.pm25.PM25AGG / mean.income.pm25.PM25AGG) * 100
-CoV.income.pm25.PM25AGG 
+CoV.pm25.points.aggregate.PM25AGG <- (sd.pm25.points.aggregate.PM25AGG / mean.pm25.points.aggregate.PM25AGG) * 100
+CoV.pm25.points.aggregate.PM25AGG 
 
 CoV.spSample.Income <- (sd.spSample.Income / mean.spSample.Income) * 100
 CoV.spSample.Income 
@@ -310,8 +299,10 @@ CoV.spSample.PM25AGG
 ## ----Normal_dist_calc-----------------------------------------------
 norm.income.tracts.t.Income_PVAL <- shapiro.test(income.tracts.t$Income)$p.value
 norm.income.tracts.t.Income_PVAL 
-norm.income.pm25.PM25AGG_PVAL <- shapiro.test(income.pm25$PM25AGG)$p.value
-norm.income.pm25.PM25AGG_PVAL 
+norm.pm25.points.aggregate.PM25AGG_PVAL <- shapiro.test(pm25.points.aggregate$PM25AGG)$p.value
+norm.pm25.points.aggregate.PM25AGG_PVAL 
+# Error in shapiro.test(pm25.points.aggregate$PM25AGG) : 
+# sample size must be between 3 and 5000
 
 norm.spSample.Income_PVAL <- shapiro.test(spSample$Income)$p.value
 norm.spSample.Income_PVAL 
@@ -323,48 +314,65 @@ Samples <- c("Income (All)", "Income (Sample)", "PM2.5 (All)", "PM2.5 (Sample)")
 Samples
 
 ## ----Mean_object----------------------------------------------------
-Mean <- c(mean.income.tracts.t.Income, mean.spSample.Income, mean.income.pm25.PM25AGG, mean.spSample.PM25AGG) 
+Mean <- c(mean.income.tracts.t.Income, mean.spSample.Income, mean.pm25.points.aggregate.PM25AGG, mean.spSample.PM25AGG) 
 Mean = round(Mean, 3)
 Mean
 
 ## ----SD_object------------------------------------------------------
-StandardDeviation <- c(sd.income.tracts.t.Income, sd.spSample.Income, sd.income.pm25.PM25AGG, sd.spSample.PM25AGG) 
+StandardDeviation <- c(sd.income.tracts.t.Income, sd.spSample.Income, sd.pm25.points.aggregate.PM25AGG, sd.spSample.PM25AGG) 
 StandardDeviation = round(StandardDeviation, 3)
 StandardDeviation
 
 ## ----Median_object--------------------------------------------------
-Median <- c(med.income.tracts.t.Income, med.spSample.Income, med.income.pm25.PM25AGG, med.spSample.PM25AGG) 
+Median <- c(med.income.tracts.t.Income, med.spSample.Income, med.pm25.points.aggregate.PM25AGG, med.spSample.PM25AGG) 
 Median = round(Median, 3)
 Median
 
 ## ----Mode_object----------------------------------------------------
-Mode <- c(mode.income.tracts.t.Income, mode.spSample.Income, mode.income.pm25.PM25AGG, mode.spSample.PM25AGG) 
+Mode <- c(mode.income.tracts.t.Income, mode.spSample.Income, mode.pm25.points.aggregate.PM25AGG, mode.spSample.PM25AGG) 
 Mode = round(Mode, 3)
 Mode
 
 ## ----Skewness_object------------------------------------------------
-Skewness <- c(skew.income.tracts.t.Income, skew.spSample.Income, skew.income.pm25.PM25AGG, skew.spSample.PM25AGG) 
+Skewness <- c(skew.income.tracts.t.Income, skew.spSample.Income, skew.pm25.points.aggregate.PM25AGG, skew.spSample.PM25AGG) 
 Skewness = round(Skewness, 3)
 Skewness
 
 ## ----Kurtosis_object------------------------------------------------
-Kurtosis <- c(kurt.income.tracts.t.Income, kurt.spSample.Income, kurt.income.pm25.PM25AGG, kurt.spSample.PM25AGG) 
+Kurtosis <- c(kurt.income.tracts.t.Income, kurt.spSample.Income, kurt.pm25.points.aggregate.PM25AGG, kurt.spSample.PM25AGG) 
 Kurtosis = round(Kurtosis, 3)
 Kurtosis
 
 ## ----CoV_object-----------------------------------------------------
-CoefficientOfVariation <- c(CoV.income.tracts.t.Income, CoV.spSample.Income, CoV.income.pm25.PM25AGG, CoV.spSample.PM25AGG) 
+CoefficientOfVariation <- c(CoV.income.tracts.t.Income, CoV.spSample.Income, CoV.pm25.points.aggregate.PM25AGG, CoV.spSample.PM25AGG) 
 CoefficientOfVariation = round(CoefficientOfVariation, 3)
 CoefficientOfVariation
 
 ## ----PVAL_object----------------------------------------------------
-Normality <- c(norm.income.tracts.t.Income_PVAL, norm.spSample.Income_PVAL, norm.income.pm25.PM25AGG_PVAL, norm.spSample.PM25AGG_PVAL) 
+Normality <- c(norm.spSample.Income_PVAL, norm.spSample.PM25AGG_PVAL) 
 Normality
 
 ## ----Table_dataframe_DescStats--------------------------------------
 data.for.table1.1 = data.frame(Samples, Mean, Median, Mode, StandardDeviation, CoefficientOfVariation, Skewness, Kurtosis, Normality)
 data.for.table1.1
 write.csv(data.for.table1.1, "DescriptiveStats1.1.csv", row.names = FALSE)
+
+## ---- Create_Print_histograms_income -------------------------------
+png("Pop.MedianIncome.tracts_Histogram.png")
+hist(income.tracts.t$Income, breaks = 30, main = "Metro Vancouver 2016 Median $ Income (n=3363) \nFrequency Distribution Histogram (by Census Tract)", xlab = "Median $ Income") #Base R style
+dev.off()
+
+png("Smp.MedianIncome.tracts_Histogram.png")
+hist(spSample$Income, breaks = 30, main = "Metro Vancouver 2016 Median $ Income Sample (n=100)\nFrequency Distribution Histogram (by Census Tract)", xlab = "Median $ Income") #Base R style
+dev.off()
+
+png("Pop.PM25AG.tracts_Histogram.png")
+hist(pm25.points.aggregate$PM25AGG, breaks = 30, main = "Metro Vancouver 2016 PM2.5 (n=3353) \nFrequency Distribution Histogram (by Census Tract)", xlab = "PM2.5 Aggregated (in ug/m^3)") #Base R style
+dev.off()
+
+png("Smp.PM25AGG.tracts_Histogram.png")
+hist(spSample$PM25AGG, breaks = 30, main = "Metro Vancouver 2016 PM2.5 Sample (n=100)\nFrequency Distribution Histogram (by Census Tract)", xlab = "PM2.5 Aggregated (in ug/m^3)") #Base R style
+dev.off()
 
 ######################################################################
 ## ------------- Point Pattern Analysis --------------------------- ##
@@ -457,7 +465,6 @@ map_vit.net <- tm_shape(income.tracts.t) + tm_borders(col='lightgrey') +
   tm_scale_bar(width = 0.22, position = c("RIGHT", "BOTTOM")) + 
   tm_compass(position = c("RIGHT", "TOP")) + 
   tm_layout(title = "Metro Vancouver Census Tracts Median 2016 $ Income\nQueen Neighbours", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .08, .03))
-map_vit.net
 
 png("map_vit.net_Income_QueenN.png")  
 map_vit.net
@@ -486,7 +493,6 @@ map_LagMean_inc <- tm_shape(income.tracts.t) +
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) + 
   tm_layout(title = "Metro Vancouver Census Tracts \nMedian 2016 $ Income Lagged Means", 
             title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .13, .03))
-map_LagMean_inc
 
 png("map_LagMean_vit_Income.png")  
 map_LagMean_inc
@@ -537,7 +543,6 @@ map_LISA_inc <- tm_shape(income.tracts.t) +
   tm_compass(position = c("LEFT", "BOTTOM")) + 
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) +  
   tm_layout(title = "Metro Vancouver Census Tracts Median 2016 $ Income\nLocal Moran's i", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .13, .03))
-map_LISA_inc
 
 png("map_LISA_vit_Income.png")  
 map_LISA_inc
@@ -556,7 +561,6 @@ map_LISA_Z_inc <- tm_shape(income.tracts.t) +
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) +  
   tm_layout(title = "Metro Vancouver Census Tracts Median 2016 $ Income\nLocal Moran's i Z values", title.position = c("LEFT", "TOP"), 
             inner.margins = c(.08, .03, .13, .03))
-map_LISA_Z_inc
 
 png("map_LISA_vit_Income_Z.png")  
 map_LISA_Z_inc
@@ -574,7 +578,6 @@ map_LISA_P_inc <- tm_shape(income.tracts.t) +
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) +  
   tm_layout(title = "Metro Vancouver Census Tracts Median 2016 $ Income\nLocal Moran's i P values", title.position = c("LEFT", "TOP"), 
             inner.margins = c(.08, .03, .13, .03))
-map_LISA_P_inc
 
 png("map_LISA_vit_Income_P.png")  
 map_LISA_P_inc
@@ -662,7 +665,6 @@ KO_PM25_predict_f0_Exp <- tm_shape(r) +
   tm_compass(position = c("RIGHT", "TOP")) + 
   tm_scale_bar(width = 0.22, position = c("RIGHT", "BOTTOM")) + 
   tm_layout(title = "Metro Vancouver Ordinary Kriging\nPM2.5 Predicted Values", title.position = c("LEFT", "TOP"), inner.margins = c(.15, .20, .13, .03))
-KO_PM25_predict_f0_Exp
 
 png("KO_PM25_predict_f0_Exp.png")
 KO_PM25_predict_f0_Exp
@@ -701,7 +703,6 @@ KO_PM25_CI_f0_Exp <- tm_shape(r) +
   tm_compass(position = c("RIGHT", "TOP")) + 
   tm_scale_bar(width = 0.22, position = c("RIGHT", "BOTTOM")) + 
   tm_layout(title = "Metro Vancouver Ordinary Kriging \nPM2.5 Confidence Intervals", title.position = c("LEFT", "TOP"), inner.margins = c(.15, .20, .13, .03))
-KO_PM25_CI_f0_Exp
 
 png("KO_PM25_CI_f0_Exp.png")
 KO_PM25_CI_f0_Exp
@@ -794,6 +795,12 @@ model.2.resids <- as.data.frame(residuals.lm(lm.model.2))
 ## ----Add_residuals2_to_spatialpolygondataframe----------------------
 pm.income.poly$residuals2 <- residuals.lm(lm.model.2)
 
+## ---- Create_Print_histograms_residuals ----------------------------
+png("Pop.MedianIncome.tracts_Histogram.png")
+hist(pm.income.poly$residuals2, breaks = 30, main = "Metro Vancouver 2016 Regression2 Residuals \nFrequency Distribution Histogram (by Census Tract)", xlab = "Residuals2") #Base R style
+dev.off()
+
+
 ## ----Observe_result_add_residuals_to_spatialpolygondataframe--------
 head(pm.income.poly)
 names(pm.income.poly)
@@ -811,7 +818,6 @@ map_pm25_vit.data_regress_residuals2 <- tm_shape(pm.income.poly) +
   tm_scale_bar(position = c(0.4, 0.05)) +  
   tm_compass(type= "4star", position=c("RIGHT", "TOP")) 
 # Use "fisher" instead of "jenks" for larger data sets
-map_pm25_vit.data_regress_residuals2
 
 #create png
 png("map_pm25_vit.data_regress_residuals2.noDot.png")
@@ -841,7 +847,6 @@ map_vit.net <- tm_shape(pm.income.poly) + tm_borders(col='lightgrey') +
   # add compass
   tm_compass(position = c("RIGHT", "TOP")) + 
   tm_layout(title = "Metro Vancouver Census Tracts 2016 PM2.5 ~ Income \nQueen Neighbours (after Regression_2)", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .08, .03))
-map_vit.net
 
 png("map_vit.net_Income_QueenN_afterRegression_2.png")  
 map_vit.net
@@ -870,7 +875,6 @@ map_LagMean_res_2 <- tm_shape(pm.income.poly) +
   tm_compass(position = c("LEFT", "BOTTOM")) + 
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) + 
   tm_layout(title = "Metro Vancouver Census Tracts 2016 Residuals Lagged Means \n PM2.5 ~ Income (after Regression)", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .13, .03))
-map_LagMean_res_2
 ## Use "fisher" instead of "jenks" for larger data sets
 
 png("map_LagMean_vit_Income_afterRegression_2.png")  
@@ -920,7 +924,6 @@ map_LISA_res_2 <- tm_shape(pm.income.poly) +
   tm_compass(position = c("LEFT", "BOTTOM")) + 
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) +  
   tm_layout(title = "Metro Vancouver Census Tracts 2016 PM2.5 ~ Income \nLocal Moran's i Residuals (after Regression)", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .17, .03))
-map_LISA_res_2
 ## Use "fisher" instead of "jenks" for larger data sets
 
 png("map_LISA_vit_Income_afterRegression_2.png")  
@@ -939,7 +942,6 @@ map_LISA_Z_res_2 <- tm_shape(pm.income.poly) +
   tm_compass(position = c("LEFT", "BOTTOM")) + 
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) +  
   tm_layout(title = "Metro Vancouver Census Tracts 2016 PM2.5 ~ Income \nLocal Moran's i Residuals Z values \n(after Regression_2)", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .17, .03))
-map_LISA_Z_res_2
 
 png("map_LISA_vit_Income_Z_afterRegression_2.png")  
 map_LISA_Z_res_2
@@ -956,7 +958,6 @@ map_LISA_P_res_2 <- tm_shape(pm.income.poly) +
   tm_compass(position = c("LEFT", "BOTTOM")) + 
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) +  
   tm_layout(title = "Metro Vancouver Census Tracts 2016 PM2.5 ~ Income \nLocal Moran's i Residuals P values \n(after Regression_2)", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .17, .03))
-map_LISA_P_res_2
 
 png("map_LISA_vit_Income_P_afterRegression_2.png")  
 map_LISA_P_res_2
@@ -1025,7 +1026,6 @@ map_gwr_r_square_2 <- tm_shape(pm.income.poly) +
   tm_compass(position = c("LEFT", "BOTTOM")) + 
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) +  
   tm_layout(title = "Metro Vancouver Census 2016 Tracts PM 2.5 ~ Income GWR r^2", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .17, .03))
-map_gwr_r_square_2
 
 # Use "fisher" instead of "jenks" for larger data sets
 
@@ -1049,7 +1049,6 @@ summary(pm.income.poly$coeff)
 
 ## ----Create_choropleth_map_of_coefficients--------------------------
 local.coefficient <- pm.income.poly$coeff
-local.coefficient
 summary(local.coefficient)
 
 ## ----Map_coefficient------------------------------------------------
@@ -1063,7 +1062,6 @@ map_gwr_coefficient_2 <- tm_shape(pm.income.poly) +
   tm_compass(position = c("LEFT", "BOTTOM")) + 
   tm_scale_bar(width = 0.22, position = c("LEFT", "BOTTOM")) +  
   tm_layout(title = "Metro Vancouver Census Tracts 2016 GWR PM 2.5 ~ Income Coefficient", title.position = c("LEFT", "TOP"), inner.margins = c(.08, .03, .17, .03))
-map_gwr_coefficient_2
 
 png("map_gwr_coefficient_2.png")  
 map_gwr_coefficient_2
@@ -1083,9 +1081,9 @@ tmap_mode("view")
 map_MdInc.t               # Median Income by postal code polygon
 map_pm25_vit.data_medInc  # with 100 sample data points
 map_LagMean_inc
-map_LISA_Inc
-map_LISA_Z_Inc
-map_LISA_P_Inc
+map_LISA_inc
+map_LISA_Z_inc
+map_LISA_P_inc
 KO_PM25_predict_f0_Exp
 KO_PM25_variance_f0_Exp
 KO_PM25_CI_f0_Exp
@@ -1102,19 +1100,86 @@ tmap_mode("plot")
 
 ## ------- Summary Stats ---------------------------------------------
 summary(income.tracts.t)
-summary(income.pm25)
+nrow(income.tracts.t) # 3363
+summary(postalcodes.t) #68320
+summary(pm25.spatial)
 summary(pm25.points.aggregate)
+nrow(pm25.points.aggregate) # 57870
 summary(spSample)
+summary(r)
 summary(pm.income.poly)
 summary(local.coefficient)
 summary(lm.model.2)
 summary(model.2.resids)
 summary(results_2)
+summary(AutoCorr_beforeReg_print.listw_2)
+summary(AutoCorr_afterReg_print.listw_2)
+summary(BeforeReg.IncLagMeans_2)
+summary(AfterReg.IncLagMeans_2)
 
-AutoCorr_beforeReg_print.listw_2
-AutoCorr_afterReg_print.listw_2
+sink("summary.income.tracts.t.2.txt")
+print(summary(income.tracts.t))
+sink()
 
-BeforeReg.IncLagMeans_2
+sink("summary.postalcodes.t.2.txt")
+print(summary(postalcodes.t))
+sink()
+
+sink("summary.pm25.spatial.2.txt")
+print(summary(pm25.spatial))
+sink()
+
+sink("summary.pm25.points.aggregate.2.txt")
+print(summary(pm25.points.aggregate))
+sink()
+
+sink("summary.spSample.2.txt")
+print(summary(spSample))
+sink()
+
+sink("summary.r.2.txt")
+print(summary(r))
+sink()
+
+sink("summary.pm.income.poly.2.txt")
+print(summary(pm.income.poly))
+sink()
+
+sink("summary.local.coefficient.2.txt")
+print(summary(local.coefficient))
+sink()
+
+sink("summary.lm.model.2.txt")
+print(summary(lm.model.2))
+sink()
+
+sink("summary.model.2.resids.txt")
+print(summary(model.2.resids))
+sink()
+
+sink("summary.results.2.txt")
+print(summary(results_2))
+sink()
+
+sink("AutoCorr.beforeReg.print.listw.2.txt")
+print(AutoCorr_beforeReg_print.listw_2)
+sink()
+
+sink("AutoCorr.afterReg.print.listw.2.txt")
+print(AutoCorr_afterReg_print.listw_2)
+sink()
+
+sink("summary.BeforeReg.IncLagMeans.2.txt")
+print(summary(BeforeReg.IncLagMeans_2))
+sink()
+
+sink("summary.AfterReg.IncLagMeans.2.txt")
+print(summary(AfterReg.IncLagMeans_2))
+sink()
+
+sink("summary.local.r.square_2.txt")
+print(summary(local.r.square_2))
+sink()
 
 ## ------- That's it! ------------------------------------------------
 
