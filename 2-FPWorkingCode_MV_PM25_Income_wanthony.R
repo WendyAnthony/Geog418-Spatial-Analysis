@@ -597,7 +597,7 @@ moran.plot(income.tracts.t$Income, vit.lw, zero.policy=NULL,
 dev.off()
 
 ######################################################################
-## ----------------- Spatial Interpolation  KO -------------------- ##
+## ------- Spatial Interpolation  Kriging Ordinary ---------------- ##
 ######################################################################
 ## ----Define_KO_formula----------------------------------------------
 f.0 <- as.formula(PM25AGG ~ 1) 
